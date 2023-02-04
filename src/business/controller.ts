@@ -1,9 +1,6 @@
-import { evaluate } from 'mathjs';
-
 import CalculationModification from './models/modifications/calculation-modification';
 import ExcludeModification from './models/modifications/exclude-modification';
 import Payment from './models/payment';
-import Transaction from './models/transaction';
 import User from './models/user';
 import { ModificationService } from './services/modification.service';
 import Service from './services/service';
@@ -24,8 +21,8 @@ export default class Controller {
     this.modificationService = new ModificationService();
   }
 
-  public addUser(name: string): User {
-    const user = User.create(name);
+  public addUser(name: string, payerId?: string): User {
+    const user = User.create(name, payerId);
     this.userService.addEntity(user);
 
     return user;
@@ -52,8 +49,7 @@ export default class Controller {
     return modification;
   }
 
-  public createTransactions(): Transaction[] {
-    console.log();
+  public createTransactions(): Map<string, Map<string, number>> {
     const payments = this.paymentService.getEntities();
     if (payments.length === 0) {
       throw new Error('No payments exist');
@@ -64,11 +60,12 @@ export default class Controller {
       throw new Error('No user exist');
     }
 
+    const usersMap = new Map(users.map((user => [user.uid, user])));
     this.transactionService.clear();
 
     for (const payment of payments) {
       const payedUser = this.userService.getEntityByUid(payment.userUid);
-      if (payedUser === undefined) throw new Error(`Can't find user with id ${payment.userUid}`);
+      if (payedUser === undefined) throw new Error(`Can't find user with id ${ payment.userUid }`);
 
       let membersMap: Map<string, User> = new Map(users.map((user) => [user.uid, user]));
 
@@ -88,15 +85,59 @@ export default class Controller {
         membersUidPaymentMap = calculationModification.applyModification(membersUidPaymentMap, payment.money);
       }
 
-      const membersPaymentMap: Map<User, number> = new Map(members.map((member) => [member, membersUidPaymentMap.get(member.uid) ?? 0]));
+      const membersPaymentMap: Map<User, number> = new Map(members.map((member: User) => {
+        return [member, membersUidPaymentMap.get(member.uid) ?? 0];
+      }));
 
       this.transactionService.generateTransactions(membersPaymentMap, payedUser, payment);
     }
 
-    this.transactionService.getEntities().forEach((tr) => console.log(tr.getResult()));
+    this.transactionService.replacePaymentMembers(usersMap);
 
-    this.transactionService.mergeTransaction();
+    const transactions = this.transactionService.getEntities();
+    const result: Map<string, Map<string, number>> = new Map();
 
-    return this.transactionService.getEntities();
+    for (const transaction of transactions) {
+      if (!result.has(transaction.from.name)) {
+        result.set(transaction.from.name, new Map());
+      }
+
+      const fromUserPayments = result.get(transaction.from.name) as Map<string, number>;
+      const toUserPaymentSum = fromUserPayments?.get(transaction.to.name) ?? 0;
+      fromUserPayments?.set(transaction.to.name, toUserPaymentSum + transaction.money);
+
+      result.set(transaction.from.name, fromUserPayments);
+    }
+
+    for (const [fromUserName, fromUserPaymentsMap] of Array.from(result.entries())) {
+      for (const [toUserName, toUserPaymentsSum] of Array.from(fromUserPaymentsMap.entries())) {
+        const relatedUserPayments = result.get(toUserName);
+        if (relatedUserPayments === undefined) {
+          continue;
+        }
+
+        const relatedUserPaymentsToCurrentUser = relatedUserPayments.get(fromUserName);
+        if (relatedUserPaymentsToCurrentUser === undefined) {
+          continue;
+        }
+
+        if (toUserPaymentsSum === relatedUserPaymentsToCurrentUser) {
+          relatedUserPayments.delete(fromUserName);
+          fromUserPaymentsMap.delete(toUserName);
+        } else if (toUserPaymentsSum > relatedUserPaymentsToCurrentUser) {
+          fromUserPaymentsMap.set(toUserName, toUserPaymentsSum - relatedUserPaymentsToCurrentUser);
+          relatedUserPayments.delete(fromUserName);
+        } else {
+          fromUserPaymentsMap.delete(toUserName);
+          relatedUserPayments.set(fromUserName, relatedUserPaymentsToCurrentUser - toUserPaymentsSum);
+        }
+      }
+
+      if (fromUserPaymentsMap.size === 0) {
+        result.delete(fromUserName);
+      }
+    }
+
+    return result;
   }
 }

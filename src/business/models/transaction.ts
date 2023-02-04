@@ -5,10 +5,9 @@ import User from './user';
 export default class Transaction extends Model {
   protected _uid: string;
   private _money: number;
-  private readonly _to: User;
-  private readonly _from: User;
+  private _to: User;
+  private _from: User;
   private readonly _payment: Payment;
-  private _subTransactions: string[] = [];
 
   private constructor(uid: string, money: number, payment: Payment, to: User, from: User) {
     super();
@@ -31,8 +30,16 @@ export default class Transaction extends Model {
     return this._uid;
   }
 
+  public set from(user: User) {
+    this._from = user;
+  }
+
   public get from(): User {
     return this._from;
+  }
+
+  public set to(user: User) {
+    this._to = user;
   }
 
   public get to(): User {
@@ -47,26 +54,11 @@ export default class Transaction extends Model {
     this._money = money;
   }
 
-  public addSubTransaction(subTransaction: string): void {
-    this._subTransactions.push(subTransaction);
-  }
-
   public get payment(): Payment {
     return this._payment;
   }
 
-  public getResult(): string {
-    const transactionsNames = [this.payment.name, ...this._subTransactions];
-    return `${transactionsNames.join(', ')}: '${this._from.name}' должен(на) скинуть '${this._to.name}' ${this._money}грн`;
-  }
-
-  public getTableResult(): Record<string, any> {
-    const transactionsNames = [this.payment.name, ...this._subTransactions];
-    return {
-      'За что': transactionsNames.join(', '),
-      'Кто': this._from.name,
-      'Кому': this._to.name,
-      'Сколько': `${this._money} грн`,
-    };
+  public getText(): string {
+    return `${ this.payment.name }: '${ this._from.name }' должен(на) скинуть '${ this._to.name }' ${ this._money }грн`;
   }
 }

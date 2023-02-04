@@ -1,46 +1,64 @@
-import Controller from './app/controller';
+import Controller from './business/controller';
+import test from './main.test';
 
 const controller = new Controller();
 
+// TODO: Remove when user interface is created
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+window.controller = controller;
+
 const kiril = controller.addUser(`Киря`);
-const nastya = controller.addUser(`Настя`);
+const nastya = controller.addUser(`Настя`, kiril.uid);
 const bodya = controller.addUser(`Бодя`);
-const lera = controller.addUser(`Лера`);
-const dimas = controller.addUser(`Димас-трезвенник`);
-const dimas2 = controller.addUser(`Димас-язвенник`);
-const pasha = controller.addUser(`Паша`);
-const nastyaEng = controller.addUser(`Настя с англии`);
-const tosik = controller.addUser(`Тосик`);
+const lera = controller.addUser(`Лера`, bodya.uid);
 const volodya = controller.addUser(`Володька ❤`);
-const yarik = controller.addUser(`Ярик`);
-const artyom = controller.addUser(`Артём`);
+const dimas = controller.addUser(`Димас-трезвенник`);
+const andrey = controller.addUser(`Андрей`);
 
-const payment1 = controller.addPayment(`Жрачка`, yarik.uid, 1465);
+const payment1 = controller.addPayment(`Пиво`, bodya.uid, 420);
+controller.excludeFromPayment(payment1.uid, dimas.uid);
+controller.excludeFromPayment(payment1.uid, kiril.uid);
+controller.excludeFromPayment(payment1.uid, nastya.uid);
+controller.excludeFromPayment(payment1.uid, andrey.uid);
 
-const payment2 = controller.addPayment(`Алкашка`, yarik.uid, 814);
-controller.excludeFromPayment(payment2.uid, lera.uid);
-controller.excludeFromPayment(payment2.uid, dimas.uid);
+const payment2 = controller.addPayment(`Суши`, bodya.uid, 838);
+controller.excludeFromPayment(payment2.uid, andrey.uid);
 
-const payment3 = controller.addPayment(`Калик`, dimas.uid, 1200);
-controller.excludeFromPayment(payment3.uid, dimas.uid);
-controller.excludeFromPayment(payment3.uid, lera.uid);
-controller.excludeFromPayment(payment3.uid, yarik.uid);
-controller.excludeFromPayment(payment3.uid, volodya.uid);
-controller.excludeFromPayment(payment3.uid, nastyaEng.uid);
-controller.excludeFromPayment(payment3.uid, artyom.uid);
+controller.addPayment(`Пицца`, andrey.uid, 500);
 
-const payment4 = controller.addPayment(`Такси`, dimas.uid, 350);
-controller.excludeFromPayment(payment4.uid, bodya.uid);
-controller.excludeFromPayment(payment4.uid, lera.uid);
-controller.excludeFromPayment(payment4.uid, dimas2.uid);
-controller.excludeFromPayment(payment4.uid, pasha.uid);
-controller.excludeFromPayment(payment4.uid, tosik.uid);
-controller.excludeFromPayment(payment4.uid, yarik.uid);
-controller.excludeFromPayment(payment4.uid, artyom.uid);
+const transactions = controller.createTransactions();
+const result = [];
 
-const payment5 = controller.addPayment(`Шашлындос`, pasha.uid, 1200);
-controller.excludeFromPayment(payment5.uid, dimas.uid);
+/* eslint-disable @typescript-eslint/naming-convention, max-len */
+for (const [fromUserName, fromUserPaymentsMap] of Array.from(transactions.entries())) {
+  for (const [toUserName, toUserPaymentsSum] of Array.from(fromUserPaymentsMap.entries())) {
+    result.push({
+      "Кто": fromUserName,
+      "Кому": toUserName,
+      "Сколько": toUserPaymentsSum,
+    });
+  }
+}
 
-const transactions2 = controller.createTransactions();
+console.table(result);
 
-console.table(transactions2.map((transaction) => transaction.getTableResult()));
+test();
+// const transactions = controller.createTransactions();
+// const result = [];
+
+/* eslint-disable @typescript-eslint/naming-convention */
+// for (const [fromUserName, fromUserPaymentsMap] of Array.from(transactions.entries())) {
+//   for (const [toUserName, toUserPaymentsSum] of Array.from(fromUserPaymentsMap.entries())) {
+//     result.push({
+//       "Кто": fromUserName,
+//       "Кому": toUserName,
+//       "Сколько": toUserPaymentsSum,
+//     });
+//   }
+// }
+/* eslint-enable @typescript-eslint/naming-convention */
+
+// console.table(result);
+
+
