@@ -1,5 +1,4 @@
 import Model from './model';
-import { re } from 'mathjs';
 
 export default class User extends Model {
   protected readonly _uid: string;
@@ -35,9 +34,5 @@ export default class User extends Model {
 
   public get payerId(): string {
     return this._payerId ?? this.uid;
-  }
-
-  public hasPayer(): boolean {
-    return this.payerId !== this.uid;
   }
 }

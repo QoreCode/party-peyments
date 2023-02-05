@@ -7,6 +7,7 @@ import Service from './services/service';
 import TransactionService from './services/transaction.service';
 import UserService from './services/user.service';
 import CalculationModificationFactory from './tools/calculation-modification.factory';
+import Transaction from './models/transaction';
 
 export default class Controller {
   private paymentService: Service<Payment>;
@@ -23,14 +24,14 @@ export default class Controller {
 
   public addUser(name: string, payerId?: string): User {
     const user = User.create(name, payerId);
-    this.userService.addEntity(user);
+    this.userService.addOrUpdateEntity(user);
 
     return user;
   }
 
   public addPayment(name: string, payerUid: string, money: number): Payment {
     const payment = Payment.create(name, payerUid, money);
-    this.paymentService.addEntity(payment);
+    this.paymentService.addOrUpdateEntity(payment);
 
     return payment;
   }
@@ -49,7 +50,7 @@ export default class Controller {
     return modification;
   }
 
-  public createTransactions(): Map<string, Map<string, number>> {
+  public createTransactions(): void {
     const payments = this.paymentService.getEntities();
     if (payments.length === 0) {
       throw new Error('No payments exist');
@@ -60,7 +61,6 @@ export default class Controller {
       throw new Error('No user exist');
     }
 
-    const usersMap = new Map(users.map((user => [user.uid, user])));
     this.transactionService.clear();
 
     for (const payment of payments) {
@@ -92,8 +92,15 @@ export default class Controller {
       this.transactionService.generateTransactions(membersPaymentMap, payedUser, payment);
     }
 
+    const usersMap = new Map(users.map((user => [user.uid, user])));
     this.transactionService.replacePaymentMembers(usersMap);
+  }
 
+  public getTransactions(): Transaction[] {
+    return this.transactionService.getEntities();
+  }
+
+  public getResult(): Map<string, Map<string, number>> {
     const transactions = this.transactionService.getEntities();
     const result: Map<string, Map<string, number>> = new Map();
 

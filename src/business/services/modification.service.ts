@@ -1,7 +1,11 @@
 import CalculationModification from '../models/modifications/calculation-modification';
 import ExcludeModification from '../models/modifications/exclude-modification';
 import { ModificationType } from '../models/modifications/modification';
+import { Injectable } from '@angular/core';
 
+@Injectable({
+  providedIn: 'root',
+})
 export class ModificationService {
   // paymentId - modId | Modification
   private calculationModifications: Map<string, Map<string, CalculationModification>> = new Map();

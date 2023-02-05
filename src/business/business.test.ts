@@ -1,6 +1,5 @@
-
 // TODO: заменить jest`ом
-import Controller from './business/controller';
+import Controller from './controller';
 
 export default function test(): void {
   const controller = new Controller();
@@ -123,10 +122,12 @@ export default function test(): void {
   controller.excludeFromPayment(payment18.uid, bodya.uid);
   controller.excludeFromPayment(payment18.uid, lera.uid);
 
-  const transactions = controller.createTransactions();
+  controller.createTransactions();
+
+  const transactions = controller.getResult();
   const result = [];
 
-  /* eslint-disable @typescript-eslint/naming-convention, max-len */
+  /* eslint-disable @typescript-eslint/naming-convention */
   for (const [fromUserName, fromUserPaymentsMap] of Array.from(transactions.entries())) {
     for (const [toUserName, toUserPaymentsSum] of Array.from(fromUserPaymentsMap.entries())) {
       result.push({
@@ -136,6 +137,8 @@ export default function test(): void {
       });
     }
   }
+
+  console.table(transactions)
 
   const expectedResult = [
     {
@@ -170,7 +173,7 @@ export default function test(): void {
     }
   ];
 
-  /* eslint-enable @typescript-eslint/naming-convention, max-len */
+  /* eslint-enable @typescript-eslint/naming-convention */
 
   if (result.length !== expectedResult.length) {
     throw new Error(`Result has ${ result.length } values, ${ expectedResult.length } expected`);
