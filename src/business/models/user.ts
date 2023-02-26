@@ -1,27 +1,24 @@
-import Model from './model';
+import Model from '../core/model';
 
 export default class User extends Model {
-  protected readonly _uid: string;
   private readonly _name: string;
   private _payerId: string;
+  private _eventUid: string;
 
-  private constructor(uid: string, name: string, payerId?: string) {
-    super();
+  public constructor(uid: string, name: string, eventUid: string, payerId?: string) {
+    super(uid);
 
     this._uid = uid;
     this._name = name;
+    this._eventUid = eventUid;
     this._payerId = payerId ?? uid;
   }
 
-  public static create(name: string, payerId?: string): User {
+  public static create(name: string, eventUid: string, payerId?: string): User {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const uid = self.crypto.randomUUID();
-    return new User(uid, name, payerId);
-  }
-
-  public get uid(): string {
-    return this._uid;
+    return new User(uid, name, eventUid, payerId);
   }
 
   public get name(): string {
@@ -34,5 +31,13 @@ export default class User extends Model {
 
   public get payerId(): string {
     return this._payerId ?? this.uid;
+  }
+
+  public toJson(): Record<string, any> {
+    return {
+      id: this.uid,
+      name: this._name,
+      payerId: this.payerId
+    }
   }
 }

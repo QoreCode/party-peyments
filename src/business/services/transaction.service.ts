@@ -1,33 +1,151 @@
-import Payment from '../models/payment';
-import Transaction from '../models/transaction';
-import User from '../models/user';
-import Service from './service';
-import { BehaviorSubject } from 'rxjs';
+import Transaction from '@business/models/transaction';
+import EntityService from '@business/core/entity-service';
+import { Injectable } from '@angular/core';
+import User from '@business/models/user';
+import PaymentService from '@business/services/payment.service';
+import UserService from '@business/services/user.service';
+import ExcludeModificationService from '@business/services/exclude-modification.service';
+import CalculationModificationService from '@business/services/calculation-modification.service';
+import Payment from '@business/models/payment';
+import EventService from '@business/services/event.service';
+import ApplicationStateService from '@business/services/application-state.service';
 
-export default class TransactionService extends Service<Transaction> {
-  public clear(): void {
-    this.entities = new BehaviorSubject(new Map());
+@Injectable({
+  providedIn: 'root',
+})
+export default class TransactionService extends EntityService<Transaction> {
+  protected _tableName: string = 'none';
+
+  constructor(
+    private _applicationStateService: ApplicationStateService,
+    private _paymentService: PaymentService,
+    private _userService: UserService,
+    private _eventService: EventService,
+    private _excludeModificationService: ExcludeModificationService,
+    private _calculationModificationService: CalculationModificationService
+  ) {
+    super();
   }
 
-  public generateTransactions(membersPaymentMap: Map<User, number>, toUser: User, payment: Payment): void {
+  // TODO: refactor this shit
+  public async createTransactions(eventUid: string): Promise<void> {
+    const payments = await this._paymentService.getEntities();
+    if (payments.length === 0) {
+      throw new Error('No payments exist');
+    }
+
+    const users = await this._userService.getEntities();
+    if (users.length === 0) {
+      throw new Error('No user exist');
+    }
+
+    this.clear();
+
+    for (const payment of payments) {
+      const payedUser = await this._userService.getEntityByUid(payment.userUid);
+      if (payedUser === undefined) throw new Error(`Can't find user with id ${ payment.userUid }`);
+
+      let membersMap: Map<string, User> = new Map(users.map((user) => [user.uid, user]));
+
+      // удаление не участвующих пользователей
+      const excludeModifications = await this._excludeModificationService.getEntitiesByPaymentId(payment.uid);
+      for (const excludeModification of excludeModifications) {
+        membersMap = excludeModification.applyModification(membersMap);
+      }
+
+      const defaultPayment = Math.round(payment.money / membersMap.size);
+      const members = Array.from(membersMap.values());
+      let membersUidPaymentMap: Map<string, number> = new Map(members.map((member) => [member.uid, defaultPayment]));
+
+      // расчет всех модификаций
+      const calculationModifications = await this._calculationModificationService.getEntitiesByPaymentId(payment.uid);
+      for (const calculationModification of calculationModifications) {
+        membersUidPaymentMap = calculationModification.applyModification(membersUidPaymentMap, payment.money);
+      }
+
+      const membersPaymentMap: Map<User, number> = new Map(members.map((member: User) => {
+        return [member, membersUidPaymentMap.get(member.uid) ?? 0];
+      }));
+
+      this.generateTransactions(membersPaymentMap, payedUser, payment, eventUid);
+    }
+
+    const usersMap = new Map(users.map((user => [user.uid, user])));
+    await this.replacePaymentMembers(usersMap);
+  }
+
+  public generateTransactions(membersPaymentMap: Map<User, number>, toUser: User, payment: Payment, eventUid: string): void {
     for (const [fromUser, memberPayment] of Array.from(membersPaymentMap.entries())) {
       if (fromUser.uid === toUser.uid) {
         continue;
       }
 
-      const transaction = Transaction.create(memberPayment, payment, toUser, fromUser);
+      const transaction = Transaction.create(memberPayment, payment, toUser, fromUser, eventUid);
       this.addOrUpdateEntity(transaction);
     }
   }
 
-  public replacePaymentMembers(usersCollection: Map<string, User>): void {
-    for (const transaction of Array.from(this.entities.getValue().values())) {
+  public async replacePaymentMembers(usersCollection: Map<string, User>): Promise<void> {
+    for (const transaction of await this.getEntities()) {
       transaction.to = usersCollection.get(transaction.to.payerId) ?? transaction.to;
       transaction.from = usersCollection.get(transaction.from.payerId) ?? transaction.from;
 
       if (transaction.to.uid === transaction.from.uid) {
-        this.deleteEntity(transaction.uid)
+        this.deleteEntity(transaction.uid);
       }
     }
+  }
+
+  // move to component
+  public async getResult(): Promise<Map<string, Map<string, number>>> {
+    const transactions = await this.getEntities();
+    const result: Map<string, Map<string, number>> = new Map();
+
+    for (const transaction of transactions) {
+      if (!result.has(transaction.from.name)) {
+        result.set(transaction.from.name, new Map());
+      }
+
+      const fromUserPayments = result.get(transaction.from.name) as Map<string, number>;
+      const toUserPaymentSum = fromUserPayments?.get(transaction.to.name) ?? 0;
+      fromUserPayments?.set(transaction.to.name, toUserPaymentSum + transaction.money);
+
+      result.set(transaction.from.name, fromUserPayments);
+    }
+
+    for (const [fromUserName, fromUserPaymentsMap] of Array.from(result.entries())) {
+      for (const [toUserName, toUserPaymentsSum] of Array.from(fromUserPaymentsMap.entries())) {
+        const relatedUserPayments = result.get(toUserName);
+        if (relatedUserPayments === undefined) {
+          continue;
+        }
+
+        const relatedUserPaymentsToCurrentUser = relatedUserPayments.get(fromUserName);
+        if (relatedUserPaymentsToCurrentUser === undefined) {
+          continue;
+        }
+
+        if (toUserPaymentsSum === relatedUserPaymentsToCurrentUser) {
+          relatedUserPayments.delete(fromUserName);
+          fromUserPaymentsMap.delete(toUserName);
+        } else if (toUserPaymentsSum > relatedUserPaymentsToCurrentUser) {
+          fromUserPaymentsMap.set(toUserName, toUserPaymentsSum - relatedUserPaymentsToCurrentUser);
+          relatedUserPayments.delete(fromUserName);
+        } else {
+          fromUserPaymentsMap.delete(toUserName);
+          relatedUserPayments.set(fromUserName, relatedUserPaymentsToCurrentUser - toUserPaymentsSum);
+        }
+      }
+
+      if (fromUserPaymentsMap.size === 0) {
+        result.delete(fromUserName);
+      }
+    }
+
+    return result;
+  }
+
+  createFromJson(data: Record<string, any>): Transaction {
+    throw new Error(`Not implemented coz not needed`);
   }
 }

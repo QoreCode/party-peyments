@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import test from '../business/business.test';
 
 @Component({
   selector: 'app-root',
@@ -10,6 +9,5 @@ export class AppComponent implements OnInit {
   public title = 'party-payments.app';
 
   ngOnInit(): void {
-    test();
   }
 }
