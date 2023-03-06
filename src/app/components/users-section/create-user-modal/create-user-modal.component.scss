@@ -1,0 +1,57 @@
+.user-modal-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-modal-btns {
+  overflow: hidden;
+  display: flex;
+  margin-top: 30px;
+  justify-content: space-between;
+
+  button {
+    flex: 0.4;
+  }
+}
+
+.user-modal-title {
+  display: flex;
+  padding-top: 15px;
+}
+
+.user-modal-separator {
+  margin: 0 10px;
+}
+
+.user-modal-label {
+  color: #bbb;
+  transition: all 0.2s;
+  font-weight: 400;
+  cursor: pointer;
+  position: relative;
+  display: block;
+
+  &:after {
+    content: '';
+    width: 0;
+    height: 1px;
+    background-color: #bbb;
+    display: block;
+    transition: all 0.2s;
+    margin: auto;
+  }
+
+  &.isActive {
+    color: black;
+
+    &:after {
+      background-color: black;
+    }
+  }
+
+  &:hover {
+    &:after {
+      width: 100%;
+    }
+  }
+}

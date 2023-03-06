@@ -1,6 +1,6 @@
 import Model from '@business/core/model';
-import User from '@business/models/user';
-import Payment from '@business/models/payment';
+import User from '@business/models/user.model';
+import Payment from '@business/models/payment.model';
 
 export default class Transaction extends Model {
   private _money: number;

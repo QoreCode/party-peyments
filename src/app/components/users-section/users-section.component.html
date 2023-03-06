@@ -1,0 +1,20 @@
+<div class="section-event-message" *ngIf="!hasSelectedEvent">
+  <div>Please select event or create new one</div>
+</div>
+<div *ngIf="hasSelectedEvent" class="section-content-wrap">
+  <div class="members-wrap">
+    <div class="members">
+      <div class="members-title">Members</div>
+      <div class="members-add add-btn" (click)="openDialog()">
+        <fa-icon [icon]="closeIcon"></fa-icon>
+      </div>
+    </div>
+  </div>
+
+  <div class="members-list">
+    <div class="no-users-found" *ngIf="users.length===0">no users found</div>
+    <ng-template *ngIf="users.length!==0" ngFor let-user [ngForOf]="users">
+      <app-user class="member-wrap" [user]="user"></app-user>
+    </ng-template>
+  </div>
+</div>

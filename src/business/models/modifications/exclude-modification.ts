@@ -1,4 +1,4 @@
-import User from '@business/models/user';
+import User from '@business/models/user.model';
 import Model from '@business/core/model';
 
 export default class ExcludeModification extends Model {

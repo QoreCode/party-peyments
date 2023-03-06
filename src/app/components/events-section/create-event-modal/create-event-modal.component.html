@@ -1,0 +1,31 @@
+<div class="event-modal-wrap">
+  <div class="event-modal-title" mat-dialog-title>Create new event</div>
+
+  <div mat-dialog-content>
+    <form class="event-modal-form">
+      <mat-form-field appearance="fill">
+        <mat-label>Name</mat-label>
+        <input matInput placeholder="Please enter event name" value="event-name" [formControl]="nameInputControl">
+      </mat-form-field>
+
+      <mat-form-field class="users-selection" appearance="fill">
+        <mat-label>Users</mat-label>
+        <mat-select [formControl]="userIdsInputControl" multiple>
+          <ng-template *ngIf="users.length!==0" ngFor let-user [ngForOf]="users">
+            <mat-option [value]="user.uid">{{ user.name }}</mat-option>
+          </ng-template>
+        </mat-select>
+      </mat-form-field>
+    </form>
+
+    <div class="event-modal-btns">
+      <button mat-raised-button color="warn" (click)="onNoClick()">Cancel</button>
+      <button mat-raised-button color="primary" (click)="createEvent()">Create</button>
+    </div>
+  </div>
+
+</div>
+
+<!--private readonly _date: number;-->
+<!--private readonly _name: string;-->
+<!--private readonly _userIds: string[];-->

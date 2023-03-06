@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import User from '@business/models/user';
+import User from '@business/models/user.model';
 import EntityService from '@business/core/entity-service';
 
 @Injectable({
@@ -11,9 +11,7 @@ export default class UserService extends EntityService<User> {
   public createFromJson(data: Record<string, any>): User {
     const uid = this.extractValue(data, 'uid');
     const name = this.extractValue(data, 'name');
-    const eventUid = this.extractValue(data, 'eventUid');
-    const payerId = data.payerId;
 
-    return new User(uid, name, eventUid, payerId);
+    return new User(uid, name);
   }
 }

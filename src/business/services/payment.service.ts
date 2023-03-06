@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import Payment from '@business/models/payment';
+import Payment from '@business/models/payment.model';
 import EntityService from '@business/core/entity-service';
 
 @Injectable({

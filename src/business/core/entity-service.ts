@@ -35,7 +35,7 @@ export default abstract class EntityService<TEntity extends Model> implements IE
     this.entities.next(new Map());
   }
 
-  public subscribe(onChange: (entity: Map<string, TEntity>) => void): Subscription {
+  public subscribe(onChange: (entities: Map<string, TEntity>) => void): Subscription {
     return this.entities.subscribe({ next: onChange });
   }
 

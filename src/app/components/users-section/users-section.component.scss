@@ -1,0 +1,35 @@
+.section-content-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.members-wrap {
+  width: 100%;
+}
+
+.members {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.members-list {
+  margin-top: 45px;
+}
+
+.no-users-found {
+  font-size: 20px;
+  text-align: center;
+  color: #AAA;
+  text-shadow: -1px 1px 1px #FFF;
+}
+
+.member-wrap {
+  display: block;
+
+  &:not(:first-child) {
+    margin-top: 20px;
+  }
+}

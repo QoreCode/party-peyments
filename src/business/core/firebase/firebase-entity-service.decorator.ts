@@ -50,7 +50,12 @@ export default class FirebaseEntityServiceDecorator<TEntity extends Model> imple
 
     return new Promise((resolve) => {
       onValue(starCountRef, (snapshot) => {
-        const entities = snapshot.val().map((value: any) => this.entityService.createFromJson(value))
+        if (snapshot.val() === null) {
+          resolve([]);
+          return;
+        }
+
+        const entities = Object.values(snapshot.val()).map((value: any) => this.entityService.createFromJson(value))
         this.entityService.addOrUpdateEntities(entities);
 
         resolve(entities);

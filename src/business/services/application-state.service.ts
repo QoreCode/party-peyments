@@ -11,7 +11,7 @@ export interface ApplicationState {
 export default class ApplicationStateService {
   protected applicationState: BehaviorSubject<ApplicationState> = new BehaviorSubject({});
 
-  public setSelectedEventUid(selectedEventUid: string): void {
+  public setSelectedEventUid(selectedEventUid: string | undefined): void {
     this.applicationState.next({ selectedEventUid });
   }
 

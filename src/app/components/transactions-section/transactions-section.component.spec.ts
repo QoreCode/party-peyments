@@ -1,0 +1,23 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { TransactionsSectionComponent } from './transactions-section.component';
+
+describe('TransactionsSectionComponent', () => {
+  let component: TransactionsSectionComponent;
+  let fixture: ComponentFixture<TransactionsSectionComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [ TransactionsSectionComponent ]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(TransactionsSectionComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

@@ -1,12 +1,12 @@
-import Transaction from '@business/models/transaction';
+import Transaction from '@business/models/transaction.model';
 import EntityService from '@business/core/entity-service';
 import { Injectable } from '@angular/core';
-import User from '@business/models/user';
+import User from '@business/models/user.model';
 import PaymentService from '@business/services/payment.service';
 import UserService from '@business/services/user.service';
 import ExcludeModificationService from '@business/services/exclude-modification.service';
 import CalculationModificationService from '@business/services/calculation-modification.service';
-import Payment from '@business/models/payment';
+import Payment from '@business/models/payment.model';
 import EventService from '@business/services/event.service';
 import ApplicationStateService from '@business/services/application-state.service';
 

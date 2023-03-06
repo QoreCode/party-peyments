@@ -1,0 +1,73 @@
+.user-card {
+  z-index: 2;
+}
+
+.user-card-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 0 0 20px;
+  flex-direction: row;
+}
+
+.delete-user {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 15px;
+  cursor: pointer;
+  background-color: white;
+  transition: all 0.2s;
+  font-size: 18px;
+  border-radius: 0 10px 10px 0;
+
+  &:hover {
+    background-color: #FFCDD2;
+  }
+}
+
+.user-name {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 180px;
+  white-space: nowrap;
+}
+
+.related-users-wrap {
+  padding: 20px 15px 0;
+  z-index: 1;
+  width: calc(100% - 40px);
+  margin: -21px auto 0;
+}
+
+.related-users-down-icon {
+  background-color: #eee;
+  text-align: center;
+  position: relative;
+  cursor: pointer;
+  margin: 0 -15px;
+  border-radius: 0 0 10px 10px;
+  border-top: 1px solid #aaa;
+
+  fa-icon {
+    position: relative;
+  }
+
+  &:hover {
+    fa-icon {
+      animation: bouncing 0.7s linear infinite;
+    }
+  }
+}
+
+@keyframes bouncing {
+  0% {
+    top: -1px;
+  }
+  50% {
+    top: 1px;
+  }
+  100% {
+    top: -1px;
+  }
+}

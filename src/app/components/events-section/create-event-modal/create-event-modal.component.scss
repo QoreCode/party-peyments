@@ -1,0 +1,16 @@
+.event-modal-form {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+}
+
+.event-modal-btns {
+  overflow: hidden;
+  display: flex;
+  margin-top: 30px;
+  justify-content: space-between;
+
+  button {
+    flex: 0.4;
+  }
+}

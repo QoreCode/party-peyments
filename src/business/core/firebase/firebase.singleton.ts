@@ -1,16 +1,12 @@
 import { initializeApp } from "firebase/app";
 import { getDatabase, Database } from 'firebase/database';
+import { deleteApp } from '@firebase/app';
 
 export default class Firebase {
   private static _instance: Firebase;
-  private readonly _database: Database;
+  private _database?: Database;
 
   private constructor() {
-    const app = initializeApp({
-      databaseURL: "https://party-payments-default-rtdb.europe-west1.firebasedatabase.app/",
-    });
-
-    this._database = getDatabase(app);
   }
 
   public static getInstance(): Firebase {
@@ -21,7 +17,28 @@ export default class Firebase {
     return Firebase._instance;
   }
 
+  public initialize(databaseURL: string): void {
+    const app = initializeApp({ databaseURL });
+
+    try {
+      this._database = getDatabase(app);
+    } catch (e) {
+      this._database = undefined;
+      deleteApp(app);
+
+      throw e;
+    }
+  }
+
+  public isInitialized(): boolean {
+    return this._database !== undefined;
+  }
+
   public get db(): Database {
+    if (this._database === undefined) {
+      throw new Error(`DB isn't initialized`);
+    }
+
     return this._database;
   }
 }

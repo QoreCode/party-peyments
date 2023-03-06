@@ -1,0 +1,13 @@
+<div class="event-wrap" [ngClass]="{'selected': isSelectedEvent}">
+  <div class="event-data" (click)="setSelectEvent()">
+    <div class="event-name" [title]="partyEvent.name">{{ partyEvent.name }}</div>
+    <div class="event-date">{{ partyEvent.dataLabel }}</div>
+  </div>
+  <div class="event-remove" mwlConfirmationPopover
+       [popoverTitle]="'Are you sure?'"
+       [popoverMessage]="'The data about related payments, users, etc. will be lost!'"
+       placement="bottom"
+       (confirm)="removeEvent()">
+    <fa-icon [icon]="closeIcon"></fa-icon>
+  </div>
+</div>
