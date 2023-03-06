@@ -16,8 +16,10 @@
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
+          "deployUrl": "/party-peyments/",
           "options": {
-            "outputPath": "dist/party-payments.app",
+            "deployUrl": "/party-peyments/",
+            "outputPath": "docs",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [

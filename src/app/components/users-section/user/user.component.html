@@ -14,8 +14,18 @@
   </div>
 </mat-card>
 
-<mat-card class="related-users-wrap">
-  <div class="related-users-down-icon">
+<mat-card class="related-users-wrap" [ngClass]="{isOpened: isOpened}">
+  <div class="payed-for">
+    <div class="payed-for-label">Pay for:</div>
+    <mat-form-field class="users-selection" appearance="fill">
+      <mat-select [formControl]="userIdsInputControl" multiple>
+        <ng-template *ngIf="users.length!==0" ngFor let-user [ngForOf]="users">
+          <mat-option [value]="user.uid">{{ user.name }}</mat-option>
+        </ng-template>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <div class="related-users-down-icon" (click)="toggleRelatedUsers()">
     <fa-icon [icon]="arrowIcon"></fa-icon>
   </div>
 </mat-card>

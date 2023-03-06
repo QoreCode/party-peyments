@@ -8,6 +8,7 @@ import EventService from '@business/services/event.service';
 import FirebaseEntityServiceDecorator from '@business/core/firebase/firebase-entity-service.decorator';
 import ApplicationStateService from '@business/services/application-state.service';
 import { ToastrService } from 'ngx-toastr';
+import { FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-user',
@@ -18,6 +19,13 @@ export class UserComponent {
   @Input() user!: User;
   public closeIcon = faXmark;
   public arrowIcon = faChevronDown;
+  public isOpened: boolean = false;
+  public users = [
+    { uid: '1', name: 'lol1' },
+    { uid: '2', name: 'lol2' }
+  ];
+
+  public userIdsInputControl = new FormControl<string[]>([]);
 
   constructor(public eventService: EventService,
               public toastr: ToastrService,
@@ -42,5 +50,9 @@ export class UserComponent {
 
     const eventFBDec = new FirebaseEntityServiceDecorator(this.eventService);
     await eventFBDec.addOrUpdateEntity(event);
+  }
+
+  public toggleRelatedUsers() {
+    this.isOpened = !this.isOpened;
   }
 }
