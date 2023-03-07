@@ -16,7 +16,7 @@ export default class PartyEvent extends Model {
 
   // todo: optimize
   public async addUserUid(userUid: string): Promise<void> {
-    const isUserExist = this.getUserUserEventPropertiesByUserUid(userUid) !== undefined;
+    const isUserExist = this.getUserEventPropertiesByUserUid(userUid) !== undefined;
     if (isUserExist) return;
 
     this._usersEventProperties.push(UserEventProperties.create(userUid));
@@ -44,7 +44,7 @@ export default class PartyEvent extends Model {
     return this._usersEventProperties;
   }
 
-  public getUserUserEventPropertiesByUserUid(userUid: string): UserEventProperties | undefined {
+  public getUserEventPropertiesByUserUid(userUid: string): UserEventProperties | undefined {
     return this._usersEventProperties.find((usersEventProperties: UserEventProperties) => usersEventProperties.userUid === userUid);
   }
 

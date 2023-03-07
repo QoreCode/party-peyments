@@ -17,7 +17,7 @@
 <mat-card class="related-users-wrap" [ngClass]="{isOpened: isOpened}">
   <div class="payed-for">
     <div class="payed-for-label">Pay for:</div>
-    <mat-form-field class="users-selection" appearance="fill">
+    <mat-form-field class="users-selection" appearance="fill" [title]='usersTitle'>
       <mat-select [formControl]="userIdsInputControl" multiple>
         <ng-template *ngIf="usersToSelect.length!==0" ngFor let-user [ngForOf]="usersToSelect">
           <mat-option [value]="user.uid">{{ user.name }}</mat-option>

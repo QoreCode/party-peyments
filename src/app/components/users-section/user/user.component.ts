@@ -24,6 +24,7 @@ export class UserComponent implements OnDestroy, OnInit {
   public arrowIcon = faChevronDown;
   public isOpened: boolean = false;
   public allUsers: User[] = [];
+  public currentEvent!: PartyEvent;
 
   public usersSubscription!: Subscription;
   public selectSubscription!: Subscription;
@@ -36,9 +37,33 @@ export class UserComponent implements OnDestroy, OnInit {
   ) {
   }
 
+  public get usersTitle(): string {
+    const selectedUserUidsSet = new Set(this.userIdsInputControl.getRawValue() ?? []);
+    return this.allUsers.reduce((titleParts: string[], user: User) => {
+      if (selectedUserUidsSet.has(user.uid)) {
+        titleParts.push(user.name);
+      }
+
+      return titleParts;
+    }, []).join(', ');
+  }
+
   public async ngOnInit() {
-    const event: PartyEvent = await this.getCurrentEvent();
-    const eventProperties = event.getUserUserEventPropertiesByUserUid(this.user.uid);
+    const selectedEventUid = this.applicationStateService.getSelectedEventUid();
+    if (selectedEventUid === undefined) {
+      this.toastr.error(`No selected events found. Stop breaking my app!`);
+      return;
+    }
+
+    const event = await this.eventService.getEntityByUid(selectedEventUid);
+    if (event === undefined) {
+      this.toastr.error(`Selected event no found. Stop breaking my app!`);
+      return;
+    }
+
+    this.currentEvent = event;
+
+    const eventProperties = event.getUserEventPropertiesByUserUid(this.user.uid);
     if (eventProperties === undefined) {
       this.toastr.error(`Event is undefined. Something unbelievable is going on`);
       return;
@@ -68,11 +93,10 @@ export class UserComponent implements OnDestroy, OnInit {
         throw new Error(`User is undefined. Something unbelievable is going on`);
       }
 
-      const event = await this.getCurrentEvent();
-      await event.removeUserUid(this.user.uid);
+      await this.currentEvent.removeUserUid(this.user.uid);
 
       const eventFBDec = new FirebaseEntityServiceDecorator(this.eventService);
-      await eventFBDec.addOrUpdateEntity(event);
+      await eventFBDec.addOrUpdateEntity(this.currentEvent);
     } catch (e) {
       if (e instanceof Error) {
         this.toastr.error(e.message);
@@ -80,20 +104,6 @@ export class UserComponent implements OnDestroy, OnInit {
         console.error(e);
       }
     }
-  }
-
-  public async getCurrentEvent(): Promise<PartyEvent> {
-    const selectedEventUid = this.applicationStateService.getSelectedEventUid();
-    if (selectedEventUid === undefined) {
-      throw new Error('No selected events found. Stop breaking my app!');
-    }
-
-    const event = await this.eventService.getEntityByUid(selectedEventUid);
-    if (event === undefined) {
-      throw new Error('Selected event no found. Stop breaking my app!');
-    }
-
-    return event;
   }
 
   public toggleRelatedUsers() {
