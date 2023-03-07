@@ -31,8 +31,16 @@ export default class UserEventProperties extends Model {
     this._payedForUserUids.push(userUid);
   }
 
+  public setUserUidForPayed(userUids: string[]): void {
+    this._payedForUserUids = userUids;
+  }
+
   public removeUserUidForPayed(userUid: string): void {
     this._payedForUserUids = this._payedForUserUids.filter((payedForUserUid: string) => payedForUserUid !== userUid);
+  }
+
+  public hasPayedUserUid(userUid: string): boolean {
+    return this._payedForUserUids.some((payedUserUid: string) => payedUserUid === userUid);
   }
 
   public toJson(): Record<string, any> {

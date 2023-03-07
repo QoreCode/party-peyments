@@ -19,7 +19,7 @@
     <div class="payed-for-label">Pay for:</div>
     <mat-form-field class="users-selection" appearance="fill">
       <mat-select [formControl]="userIdsInputControl" multiple>
-        <ng-template *ngIf="users.length!==0" ngFor let-user [ngForOf]="users">
+        <ng-template *ngIf="usersToSelect.length!==0" ngFor let-user [ngForOf]="usersToSelect">
           <mat-option [value]="user.uid">{{ user.name }}</mat-option>
         </ng-template>
       </mat-select>
