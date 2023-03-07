@@ -50,9 +50,17 @@ export class UserComponent implements OnDestroy, OnInit {
       }
 
       return titleParts;
-    }, []).join(', ');
+    }, []);
 
-    return `You gonna pay for: ${ usersToPayFor }`;
+    if (usersToPayFor.length === 0) {
+      return '';
+    }
+
+    if (usersToPayFor.length === this.usersToSelect.length) {
+      return `You are gonna pay for all users in this event!`;
+    }
+
+    return `You are gonna pay for: ${ usersToPayFor.join(', ') }`;
   }
 
   public async ngOnInit() {
