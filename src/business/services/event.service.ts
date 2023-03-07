@@ -13,7 +13,7 @@ export default class EventService extends EntityService<PartyEvent> {
     const uid = this.extractValue(data, 'uid');
     const date = this.extractValue(data, 'date');
     const name = this.extractValue(data, 'name');
-    const usersEventPropertiesData = this.extractValue(data, 'usersEventProperties');
+    const usersEventPropertiesData = data.usersEventProperties ?? [];
 
     const usersEventProperties = usersEventPropertiesData ?
       usersEventPropertiesData.map((userEventPropertiesData: any) => this.createUserEventProperty(userEventPropertiesData)) : [];

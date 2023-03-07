@@ -1,4 +1,15 @@
 <div class="section-event-message" *ngIf="!hasSelectedEvent">
   <div>Please select event or create new one</div>
 </div>
-<div *ngIf="hasSelectedEvent">all fine</div>
+
+<div class="section-event-message" *ngIf="!hasAttachedUsers">
+  <div>Please attach users to the event</div>
+</div>
+
+
+<div *ngIf="hasSelectedEvent && hasAttachedUsers" style="width: 100%" class="payments-wrap">
+  <fa-icon [icon]="plusIcon" class="add-new-payment-icon"></fa-icon>
+  <div class="payments-list-wrap">
+    <app-payment></app-payment>
+  </div>
+</div>

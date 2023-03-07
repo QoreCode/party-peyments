@@ -20,8 +20,11 @@
   transition: all 0.2s;
   font-size: 18px;
   border-radius: 0 10px 10px 0;
+  color: #D50000;
+  border-left: 1px solid #eee;
 
   &:hover {
+    color: #000;
     background-color: #FFCDD2;
   }
 }
@@ -82,7 +85,35 @@
   font-size: 12px;
 }
 
+.no-user-text {
+  width: 100%;
+  font-size: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 28px;
+  color: #999;
+}
+
 ::ng-deep {
+  .mdc-list-item__primary-text {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+
+    fa-icon {
+      font-size: 20px;
+    }
+  }
+
+  .mat-mdc-select-placeholder {
+    font-size: 12px;
+  }
+
+  .mat-mdc-select-value {
+    padding: 0 5px;
+  }
+
   .payed-for {
     display: flex;
     justify-content: space-between;

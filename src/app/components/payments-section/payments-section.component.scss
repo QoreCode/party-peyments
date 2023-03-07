@@ -1,0 +1,24 @@
+.add-new-payment-icon {
+  font-size: 46px;
+  cursor: pointer;
+  transform: rotate(0);
+  display: inline-block;
+  transition: all 0.2s;
+  line-height: 1em;
+  width: 46px;
+  height: 46px;
+  color: #304FFE;
+
+  &:hover {
+    color: #000;
+    transform: rotate(90deg);
+  }
+}
+
+.payments-wrap {
+  text-align: center;
+}
+
+.payments-list-wrap {
+  margin-top: 20px;
+}

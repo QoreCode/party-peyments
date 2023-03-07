@@ -34,10 +34,18 @@ export default class PartyEvent extends Model {
     if (userIndex === -1) throw new Error(`User with id '${ userUid }' isn't exist in event '${ this.name }'`);
 
     this._usersEventProperties.splice(userIndex, 1);
+
+    this._usersEventProperties.forEach((userEventProperties: UserEventProperties) => {
+      userEventProperties.removeUserUidForPayed(userUid);
+    })
   }
 
   public get name(): string {
     return this._name;
+  }
+
+  public get date(): number {
+    return this._date;
   }
 
   public get usersEventProperties(): UserEventProperties[] {

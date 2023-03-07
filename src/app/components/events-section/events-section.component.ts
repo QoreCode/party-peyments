@@ -19,7 +19,9 @@ export class EventsSectionComponent implements OnDestroy {
 
   constructor(private eventService: EventService, public dialog: MatDialog) {
     this.eventsSubscription = eventService.subscribe((entities: Map<string, PartyEvent>) => {
-      this.eventsList = Array.from(entities.values());
+      this.eventsList = Array.from(entities.values()).sort((event1: PartyEvent, event2: PartyEvent) => {
+        return event2.date - event1.date;
+      });
     });
 
     const fbDec = new FirebaseEntityServiceDecorator(this.eventService);

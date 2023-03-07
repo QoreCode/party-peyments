@@ -26,6 +26,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { UserComponent } from './components/users-section/user/user.component';
 import { MatCardModule } from '@angular/material/card';
 import { CreateUserModalComponent } from './components/users-section/create-user-modal/create-user-modal.component';
+import { PaymentComponent } from './components/payments-section/payment/payment.component';
 
 @NgModule({
   declarations: [
@@ -39,7 +40,8 @@ import { CreateUserModalComponent } from './components/users-section/create-user
     EventComponent,
     CreateEventModalComponent,
     UserComponent,
-    CreateUserModalComponent
+    CreateUserModalComponent,
+    PaymentComponent
   ],
   imports: [
     BrowserModule,

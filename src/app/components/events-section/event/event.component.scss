@@ -37,8 +37,11 @@
   cursor: pointer;
   padding: 14px 15px 15px 10px;
   transition: all 0.2s;
+  color: #D50000;
+  border-left: 1px solid #EEE;
 
   &:hover {
+    color: black;
     background-color: #FFCDD2;
   }
 }
