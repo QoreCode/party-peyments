@@ -6,12 +6,13 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import EventService from '@business/services/event.service';
 import FirebaseEntityServiceDecorator from '@business/core/firebase/firebase-entity-service.decorator';
-import ApplicationStateService from '@business/services/application-state.service';
+import ApplicationStateService, { ApplicationState } from '@business/services/application-state.service';
 import { ToastrService } from 'ngx-toastr';
 import { FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import UserService from '@business/services/user.service';
 import PartyEvent from '@business/models/party-event.model';
+import UserEventProperties from '@business/models/user-event-properties.model';
 
 @Component({
   selector: 'app-user',
@@ -27,6 +28,7 @@ export class UserComponent implements OnDestroy, OnInit {
   public currentEvent!: PartyEvent;
 
   public usersSubscription!: Subscription;
+  public applicationSubscription!: Subscription;
   public selectSubscription!: Subscription;
   public userIdsInputControl = new FormControl<string[]>([]);
 
@@ -35,35 +37,28 @@ export class UserComponent implements OnDestroy, OnInit {
               public userService: UserService,
               public applicationStateService: ApplicationStateService,
   ) {
+
+    // TODO: предусмотреть ситуацию когда юзвери платят друг за друга
+
   }
 
   public get usersTitle(): string {
     const selectedUserUidsSet = new Set(this.userIdsInputControl.getRawValue() ?? []);
-    return this.allUsers.reduce((titleParts: string[], user: User) => {
+    const usersToPayFor = this.allUsers.reduce((titleParts: string[], user: User) => {
       if (selectedUserUidsSet.has(user.uid)) {
         titleParts.push(user.name);
       }
 
       return titleParts;
     }, []).join(', ');
+
+    return `You gonna pay for: ${ usersToPayFor }`;
   }
 
   public async ngOnInit() {
-    const selectedEventUid = this.applicationStateService.getSelectedEventUid();
-    if (selectedEventUid === undefined) {
-      this.toastr.error(`No selected events found. Stop breaking my app!`);
-      return;
-    }
+    await this.setCurrentEvent();
 
-    const event = await this.eventService.getEntityByUid(selectedEventUid);
-    if (event === undefined) {
-      this.toastr.error(`Selected event no found. Stop breaking my app!`);
-      return;
-    }
-
-    this.currentEvent = event;
-
-    const eventProperties = event.getUserEventPropertiesByUserUid(this.user.uid);
+    const eventProperties = this.currentEvent.getUserEventPropertiesByUserUid(this.user.uid);
     if (eventProperties === undefined) {
       this.toastr.error(`Event is undefined. Something unbelievable is going on`);
       return;
@@ -79,12 +74,16 @@ export class UserComponent implements OnDestroy, OnInit {
       eventProperties.setUserUidForPayed(value ?? []);
 
       const eventServiceFBDec = new FirebaseEntityServiceDecorator(this.eventService);
-      await eventServiceFBDec.addOrUpdateEntity(event);
+      await eventServiceFBDec.addOrUpdateEntity(this.currentEvent);
     });
+
+    this.applicationSubscription = this.applicationStateService.subscribe(() => this.setCurrentEvent());
   }
 
   public get usersToSelect(): User[] {
-    return this.allUsers.filter((user: User) => user.uid !== this.user?.uid);
+    const involvedUsers = this.currentEvent.usersEventProperties.map((eventProperties: UserEventProperties) => eventProperties.userUid);
+    const involvedUsersSet = new Set(involvedUsers);
+    return this.allUsers.filter((user: User) => user.uid !== this.user?.uid && involvedUsersSet.has(user.uid));
   }
 
   public async deleteUser(): Promise<void> {
@@ -113,5 +112,22 @@ export class UserComponent implements OnDestroy, OnInit {
   public ngOnDestroy(): void {
     this.usersSubscription.unsubscribe();
     this.selectSubscription.unsubscribe();
+    this.applicationSubscription.unsubscribe();
+  }
+
+  private async setCurrentEvent() {
+    const selectedEventUid = this.applicationStateService.getSelectedEventUid();
+    if (selectedEventUid === undefined) {
+      this.toastr.error(`No selected events found. Stop breaking my app!`);
+      return;
+    }
+
+    const event = await this.eventService.getEntityByUid(selectedEventUid);
+    if (event === undefined) {
+      this.toastr.error(`Selected event no found. Stop breaking my app!`);
+      return;
+    }
+
+    this.currentEvent = event;
   }
 }
