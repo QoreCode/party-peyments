@@ -1,16 +1,19 @@
+.event-wrap-card {
+  border-radius: 50px;
+  transition: box-shadow 0.2s;
+
+  &.selected {
+    box-shadow: 0 6px 13px rgba(0, 0, 0, 0.30), 0 5px 4px rgba(0, 0, 0, 0.22);
+  }
+}
+
 .event-wrap {
   display: flex;
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  background-color: white;
   border-radius: 50px;
+  background-color: white;
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  transition: border 0.2s;
-
-  &.selected {
-    border: 1px solid rgba(0, 0, 0, 0.5);
-  }
 }
 
 .event-data {
