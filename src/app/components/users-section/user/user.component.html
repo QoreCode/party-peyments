@@ -24,7 +24,7 @@
           <ng-template *ngIf="usersToSelect.length!==0" ngFor let-user [ngForOf]="usersToSelect">
             <mat-option [value]="user.uid" [disabled]="isDisabledOption(user.uid)">
               <span>{{ user.name }}</span>
-              <fa-icon *ngIf="isDisabledOption(user.uid)" [icon]="infoIcon" [title]="getOptionHelpTitle(user.uid)"></fa-icon>
+              <fa-icon *ngIf="isDisabledOption(user.uid)" [icon]="infoIcon" [title]="getOptionHelpTitle(user.uid)" class="info-icon"></fa-icon>
             </mat-option>
           </ng-template>
         </mat-select>

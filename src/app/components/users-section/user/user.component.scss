@@ -24,8 +24,8 @@
   border-left: 1px solid #eee;
 
   &:hover {
-    color: #000;
-    background-color: #FFCDD2;
+    color: #FFF;
+    background-color: #D50000;
   }
 }
 
@@ -103,6 +103,10 @@
 
     fa-icon {
       font-size: 20px;
+    }
+
+    .info-icon {
+      cursor: help;
     }
   }
 

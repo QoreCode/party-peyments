@@ -10,6 +10,8 @@
 <div *ngIf="hasSelectedEvent && hasAttachedUsers" style="width: 100%" class="payments-wrap">
   <fa-icon [icon]="plusIcon" class="add-new-payment-icon"></fa-icon>
   <div class="payments-list-wrap">
-    <app-payment></app-payment>
+    <ng-template ngFor let-payment [ngForOf]="payments">
+      <app-payment [payment]="payment" class="payment-item"></app-payment>
+    </ng-template>
   </div>
 </div>

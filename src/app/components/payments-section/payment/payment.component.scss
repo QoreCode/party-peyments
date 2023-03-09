@@ -1,4 +1,94 @@
-.payment-card-wrap{
+.payment-card-wrap {
   width: 100%;
   text-align: left;
+}
+
+.details-list {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  width: 150px;
+  grid-row-gap: 15px;
+}
+
+.payment-name {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: 250px;
+  height: 1em;
+  white-space: nowrap;
+  font-size: 16px;
+  text-align: right;
+}
+
+.payment-detail-name {
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1em;
+}
+
+.payment-detail-value {
+  font-size: 14px;
+  line-height: 1em;
+  display: flex;
+  align-content: flex-end;
+}
+
+.payment-date {
+  text-align: right;
+  font-size: 10px;
+  margin-top: 5px;
+  color: #aaaaaa;
+}
+
+.payment-details {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 4px 0 4px;
+}
+
+.payment-modifications {
+  border-top: 1px solid #ddd;
+  margin-top: 20px;
+  text-align: center;
+  padding: 20px 4px 10px 4px;
+}
+
+.no-mods-text {
+  color: #aaa;
+  font-weight: 100;
+  font-size: 14px;
+}
+
+.no-mods-btn {
+  text-align: center;
+  color: #000;
+  font-weight: 400;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 5px;
+  padding: 5px;
+  border-bottom: 1px solid transparent;
+  display: inline-block;
+  transition: all 0.2s;
+  background-color: white;
+  position: relative;
+
+  &:after {
+    position: absolute;
+    content: '';
+    width: 0;
+    height: 1px;
+    background-color: #000;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    transition: all 0.2s;
+  }
+
+  &:hover {
+    &:after {
+      width: 100%;
+    }
+  }
 }

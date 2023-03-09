@@ -19,10 +19,15 @@
 .event-data {
   padding: 8px 10px 8px 18px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background-color 0.1s;
 
   &:hover {
-    background-color: #E3F2FD;
+    background-color: #304FFE;
+    color: white;
+
+    .event-date {
+      color: white;
+    }
   }
 }
 
@@ -44,8 +49,8 @@
   border-left: 1px solid #EEE;
 
   &:hover {
-    color: black;
-    background-color: #FFCDD2;
+    color: #FFF;
+    background-color: #D50000;
   }
 }
 

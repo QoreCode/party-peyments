@@ -2,16 +2,18 @@ import Model from '../core/model';
 
 export default class Payment extends Model {
   private readonly _name: string;
+  private readonly _date: number;
   private readonly _money: number;
   private readonly _userUid: string;
   private readonly _eventUid: string;
 
-  public constructor(uid: string, name: string, userUid: string, money: number, eventUid: string) {
+  public constructor(uid: string, name: string, userUid: string, money: number, eventUid: string, date: number) {
     super(uid);
 
     this._name = name;
     this._userUid = userUid;
     this._money = money;
+    this._date = date;
     this._eventUid = eventUid;
   }
 
@@ -19,11 +21,21 @@ export default class Payment extends Model {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const uid = self.crypto.randomUUID();
-    return new Payment(uid, name, userUid, money, eventUid);
+    const date = Date.now();
+    return new Payment(uid, name, userUid, money, eventUid, date);
   }
 
   public get money(): number {
     return this._money;
+  }
+
+  public get dateLabel(): string {
+    const date = new Date(this._date);
+    return `${ date.getDate() }.${ date.getMonth() + 1 }.${ date.getFullYear() } ${ date.getHours() }:${ date.getMinutes() }`;
+  }
+
+  public get eventUid(): string {
+    return this._eventUid;
   }
 
   public get userUid(): string {
@@ -36,10 +48,11 @@ export default class Payment extends Model {
 
   public toJson(): Record<string, any> {
     return {
-      id: this.uid,
+      uid: this.uid,
       name: this._name,
       userUid: this._userUid,
       money: this._money,
+      date: this._date,
       eventUid: this._eventUid,
     }
   }

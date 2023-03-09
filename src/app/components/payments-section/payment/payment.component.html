@@ -1,3 +1,22 @@
 <mat-card class="payment-card-wrap">
-  <mat-card-content>asdsad</mat-card-content>
+  <mat-card-content>
+    <div class="payment-details">
+      <div class="details-list">
+        <div class="payment-detail-name">Payer</div>
+        <div class="payment-detail-value">{{ getUserName }}</div>
+        <div class="payment-detail-name">Price</div>
+        <div class="payment-detail-value">{{ payment.money }} UAH</div>
+      </div>
+      <div class="general-details">
+        <div class="payment-name" [title]="payment.name">{{ payment.name }}</div>
+        <div class="payment-date">{{ payment.dateLabel }}</div>
+      </div>
+    </div>
+    <div class="payment-modifications">
+      <div class="no-modifications">
+        <div class="no-mods-text">No modification found for this payment ticket</div>
+        <div class="no-mods-btn">Add one</div>
+      </div>
+    </div>
+  </mat-card-content>
 </mat-card>
