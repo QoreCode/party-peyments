@@ -5,19 +5,44 @@
 
 .details-list {
   display: grid;
-  grid-template-columns: 50% 50%;
-  width: 150px;
-  grid-row-gap: 15px;
+  grid-template-columns: 75px 140px;
+  width: 215px;
+  grid-row-gap: 20px;
+  align-items: center;
 }
 
 .payment-name {
   text-overflow: ellipsis;
   overflow: hidden;
   width: 250px;
-  height: 1em;
   white-space: nowrap;
   font-size: 16px;
   text-align: right;
+
+  ::ng-deep {
+    .mat-mdc-form-field {
+      width: 100%;
+    }
+
+    .mat-mdc-form-field .mat-mdc-form-field-infix {
+      min-height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
+    .mat-mdc-select-min-line {
+      font-size: 14px;
+    }
+
+    .mat-mdc-form-field-subscript-wrapper {
+      display: none;
+    }
+
+    .mdc-text-field__input {
+      font-size: 14px;
+      text-align: right;
+    }
+  }
 }
 
 .payment-detail-name {
@@ -31,6 +56,38 @@
   line-height: 1em;
   display: flex;
   align-content: flex-end;
+  width: 140px;
+  justify-content: center;
+  align-items: baseline;
+
+  ::ng-deep {
+    .mat-mdc-form-field-flex {
+      height: 25px;
+    }
+
+    .mat-mdc-form-field .mat-mdc-form-field-infix {
+      min-height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
+    .mat-mdc-form-field-subscript-wrapper {
+      display: none;
+    }
+
+    .mat-mdc-select-min-line {
+      font-size: 14px;
+    }
+
+    .mat-mdc-form-field .mat-mdc-text-field-wrapper {
+      padding: 0;
+    }
+
+    .mdc-text-field .mdc-text-field__input {
+      padding: 0 5px;
+      font-size: 14px;
+    }
+  }
 }
 
 .payment-date {
@@ -50,7 +107,7 @@
   border-top: 1px solid #ddd;
   margin-top: 20px;
   text-align: center;
-  padding: 20px 4px 10px 4px;
+  padding: 20px 4px 5px 4px;
 }
 
 .no-mods-text {

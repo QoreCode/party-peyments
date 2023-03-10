@@ -44,7 +44,12 @@ export default abstract class EntityService<TEntity extends Model> implements IE
   }
 
   public async getEntityByUid(uid: string): Promise<TEntity | undefined> {
-    return (await this.getEntities()).find((entity: TEntity) => entity.uid === uid)
+    return (await this.getEntities()).find((entity: TEntity) => entity.uid === uid);
+  }
+
+  public async getEntityByUids(uids: string[]): Promise<TEntity[]> {
+    const uidsSet = new Set(uids);
+    return (await this.getEntities()).filter((entity: TEntity) => uidsSet.has(entity.uid));
   }
 
   protected get entities(): BehaviorSubject<Map<string, TEntity>> {

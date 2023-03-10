@@ -79,7 +79,6 @@ export class UserComponent implements OnDestroy, OnInit {
 
     this.applicationSubscription = this.applicationStateService.subscribe(() => {
       this.setCurrentEvent();
-      this.isOpened = false;
     });
 
     this.eventsSubscription = this.eventService.subscribe(async () => {

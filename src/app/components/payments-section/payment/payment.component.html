@@ -3,12 +3,31 @@
     <div class="payment-details">
       <div class="details-list">
         <div class="payment-detail-name">Payer</div>
-        <div class="payment-detail-value">{{ getUserName }}</div>
+        <div class="payment-detail-value">
+          <mat-form-field class="users-selection" appearance="fill">
+            <mat-select [formControl]="userIdsInputControl" [placeholder]="'Choose user'" (selectionChange)="changeUser()">
+              <ng-template *ngIf="usersToSelect.length!==0" ngFor let-user [ngForOf]="usersToSelect">
+                <mat-option [value]="user.uid">
+                  <span>{{ user.name }}</span>
+                </mat-option>
+              </ng-template>
+            </mat-select>
+          </mat-form-field>
+        </div>
         <div class="payment-detail-name">Price</div>
-        <div class="payment-detail-value">{{ payment.money }} UAH</div>
+        <div class="payment-detail-value">
+          <mat-form-field appearance="fill">
+            <input matInput placeholder="Please enter event name" value="event-name" [formControl]="priceInputControl">
+          </mat-form-field>
+          <span>UAH</span>
+        </div>
       </div>
       <div class="general-details">
-        <div class="payment-name" [title]="payment.name">{{ payment.name }}</div>
+        <div class="payment-name" [title]="payment.name">
+          <mat-form-field appearance="fill">
+            <input matInput placeholder="Please enter event name" value="event-name" [formControl]="nameInputControl">
+          </mat-form-field>
+        </div>
         <div class="payment-date">{{ payment.dateLabel }}</div>
       </div>
     </div>

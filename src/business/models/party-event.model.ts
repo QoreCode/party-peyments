@@ -52,6 +52,10 @@ export default class PartyEvent extends Model {
     return this._usersEventProperties;
   }
 
+  public get involvedUserUids(): string[] {
+    return this._usersEventProperties.map((userEventProperties: UserEventProperties) => userEventProperties.userUid);
+  }
+
   public getUserEventPropertiesByUserUid(userUid: string): UserEventProperties | undefined {
     return this._usersEventProperties.find((usersEventProperties: UserEventProperties) => usersEventProperties.userUid === userUid);
   }
