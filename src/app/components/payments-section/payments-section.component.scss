@@ -50,3 +50,36 @@
     display: block;
   }
 }
+
+.section-event-message.with-button {
+  display: flex;
+  flex-direction: column;
+}
+
+.section-event-button {
+  margin-top: 10px;
+  cursor: pointer;
+  color: #304FFE;
+  position: relative;
+  padding: 0 10px 5px;
+
+  &:before {
+    content: '';
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 0;
+    height: 2px;
+    margin: auto;
+    background-color: #304FFE;
+    transition: all 0.2s;
+  }
+
+  &:hover {
+    &:before {
+      width: 100%;
+    }
+  }
+}

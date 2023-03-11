@@ -1,4 +1,19 @@
-<div class="section-event-message" *ngIf="!hasSelectedEvent">
+<div class="section-event-message" *ngIf="!hasSelectedEvent; else secondBlock">
   <div>Please select event or create new one</div>
 </div>
-<div *ngIf="hasSelectedEvent">all fine</div>
+
+<ng-template #secondBlock>
+  <div class="section-event-message" *ngIf="!hasAttachedUsers; else thirdBlock">
+    <div>Please attach users to the event</div>
+  </div>
+</ng-template>
+
+<ng-template #thirdBlock>
+  <div class="section-event-message" *ngIf="!hasPayments; else contentBlock">
+    <div>Please create some payments to get result</div>
+  </div>
+</ng-template>
+
+<ng-template #contentBlock>
+  <div>all fine</div>
+</ng-template>

@@ -7,7 +7,7 @@
   display: grid;
   grid-template-columns: 75px 140px;
   width: 215px;
-  grid-row-gap: 20px;
+  grid-row-gap: 23px;
   align-items: center;
 }
 
@@ -169,6 +169,7 @@
   display: flex;
   justify-content: space-between;
   padding: 4px 4px 0 4px;
+  align-items: flex-start;
 }
 
 .payment-modifications {
@@ -186,7 +187,6 @@
 
 .no-mods-btn {
   text-align: center;
-  color: #000;
   font-weight: 400;
   font-size: 14px;
   cursor: pointer;
@@ -197,25 +197,23 @@
   transition: all 0.2s;
   background-color: white;
   position: relative;
+  color: #304FFE;
 
   &:after {
     position: absolute;
     content: '';
     width: 0;
     height: 1px;
-    background-color: #000;
     bottom: 0;
     left: 0;
     right: 0;
     margin: auto;
     transition: all 0.2s;
+    background-color: #304FFE;
   }
 
   &:hover {
-    color: #304FFE;
-
     &:after {
-      background-color: #304FFE;
       width: 100%;
     }
   }

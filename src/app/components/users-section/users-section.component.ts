@@ -30,10 +30,6 @@ export class UsersSectionComponent implements OnDestroy {
               public userService: UserService) {
 
     const fbDec = new FirebaseEntityServiceDecorator(this.userService);
-    // fbDec.addOrUpdateEntity(new User(`1`, `User 1`));
-    // fbDec.addOrUpdateEntity(new User(`2`, `User 2`));
-    // fbDec.addOrUpdateEntity(new User(`3`, `User 3`));
-    // fbDec.addOrUpdateEntity(new User(`4`, `User 4`));
     fbDec.getEntities();
 
     this.usersSubscription = this.applicationStateService.subscribe((applicationState: ApplicationState) => {

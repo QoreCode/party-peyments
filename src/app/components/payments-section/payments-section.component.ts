@@ -30,24 +30,10 @@ export class PaymentsSectionComponent implements OnDestroy, OnInit {
 
     const fbDec = new FirebaseEntityServiceDecorator(this.paymentService);
     fbDec.getEntities();
-    // const m = new Payment(
-    //   '1',
-    //   `Пьянка, Пьянка, Пьянка, Пьянка, Пьянка, Пьянка, Пьянка, Пьянка, Пьянка, Пьянка, Пьянка`,
-    //   '1',
-    //   1583,
-    //   '614c9804-18c1-43f4-a410-ffe105df06e9',
-    //   Date.now()
-    // );
-    // const m2 = new Payment(
-    //   '2',
-    //   `Пьянка 2`,
-    //   '2',
-    //   1124,
-    //   '614c9804-18c1-43f4-a410-ffe105df06e9',
-    //   Date.now() - 3273727
-    // );
-    // fbDec.addOrUpdateEntity(m);
-    // fbDec.addOrUpdateEntity(m2);
+  }
+
+  public get hasPayments(): boolean {
+    return this.payments.length > 0;
   }
 
   public addPayment() {
@@ -59,6 +45,8 @@ export class PaymentsSectionComponent implements OnDestroy, OnInit {
 
     const payment = Payment.create('', '', 0, selectedEventUid);
     this.paymentService.addOrUpdateEntity(payment);
+
+    this.toastr.success(`Payment was successfully added. Do not forget to save it!`);
   }
 
   public get hasSelectedEvent(): boolean {
@@ -97,6 +85,7 @@ export class PaymentsSectionComponent implements OnDestroy, OnInit {
         return;
       }
 
+      this.setHasAttachedUsers();
       this.payments = (await this.paymentService.getPaymentsByEventUid(selectedEventUid))
         .sort((a, b) => b.date - a.date);
     });

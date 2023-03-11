@@ -7,7 +7,6 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { MatDialog } from '@angular/material/dialog';
 import { CreateEventModalComponent } from '@app/components/events-section/create-event-modal/create-event-modal.component';
 import ApplicationStateService from '@business/services/application-state.service';
-import { DEBUG } from '@angular/compiler-cli/src/ngtsc/logging/src/console_logger';
 
 @Component({
   selector: 'app-events-section',
@@ -22,12 +21,6 @@ export class EventsSectionComponent implements OnDestroy, OnInit {
   constructor(private eventService: EventService, public dialog: MatDialog, private applicationStateService: ApplicationStateService) {
     const fbDec = new FirebaseEntityServiceDecorator(this.eventService);
     fbDec.getEntities();
-
-    // fbDec.addOrUpdateEntities([
-    //   new PartyEvent(`1`, (new Date()).getTime(), `event name 1`, [`1`]),
-    //   new PartyEvent(`2`, (new Date()).getTime()-241211250, `event name 2`, [`2`]),
-    //   new PartyEvent(`3`, (new Date()).getTime()-534342235, `event name 3`, [`3`]),
-    // ]);
   }
 
   public ngOnDestroy(): void {
@@ -44,7 +37,7 @@ export class EventsSectionComponent implements OnDestroy, OnInit {
         return event2.date - event1.date;
       });
 
-      if (this.eventsList.length !== 0) {
+      if (this.eventsList.length !== 0 && this.applicationStateService.getSelectedEventUid() === undefined) {
         this.applicationStateService.setSelectedEventUid(this.eventsList[0].uid);
       }
     });

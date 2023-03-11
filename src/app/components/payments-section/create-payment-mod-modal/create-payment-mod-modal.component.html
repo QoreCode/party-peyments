@@ -1,0 +1,90 @@
+<div class="payment-modal-wrap">
+  <div class="payment-modal-title" mat-dialog-title>
+    <div class="payment-modal-label" [ngClass]="{isActive: isCalculation}" (click)="setIsCalculation(true)">
+      <span>Calculation</span>
+    </div>
+    <div class="payment-modal-separator">/</div>
+    <div class="payment-modal-label" [ngClass]="{isActive: !isCalculation}" (click)="setIsCalculation(false)">
+      <span>Exclusion</span>
+    </div>
+  </div>
+
+  <div mat-dialog-content *ngIf="isCalculation">
+    <form class="payment-modal-form">
+      <mat-form-field class="users-selection" appearance="fill">
+        <mat-label>Users</mat-label>
+        <mat-select required [formControl]="usersToCalcSelectControl" multiple>
+          <ng-template *ngIf="usersToCalcSelect.length!==0" ngFor let-user [ngForOf]="usersToCalcSelect">
+            <mat-option [value]="user.uid">{{ user.name }}</mat-option>
+          </ng-template>
+        </mat-select>
+      </mat-form-field>
+
+      <div class="money-amount-field">
+        <mat-form-field appearance="fill">
+          <mat-label>Money amount</mat-label>
+          <input matInput placeholder="Money amount modification" [formControl]="priceToCalcSelectControl">
+        </mat-form-field>
+        <div class="information-tool">
+          <fa-icon class="info-icon" [icon]="infoIcon"></fa-icon>
+
+          <div class="information-window">
+            <div class="positive-explanation">
+              <div class="explanation-title">Negative amount</div>
+              <div class="explanation-content">
+                <img src="assets/negative-amaunt-example.PNG" alt="Negative amount example">
+
+                <div class="explanation-text">
+                  If all group bought something, but not all members want to pay for some parts of this <strong>payment</strong>
+                  you can add <strong>negative calculation modification</strong> for this group of people. For example, if
+                  your group has bought snacks (<u>200 UAH</u>) and bear (<u>500 UAH</u>), but Dimas and Kiril don't want to drink it, you
+                  can
+                  create <strong>payment</strong> with <u>700 UAH</u> in total, but add <strong>negative calculation modification</strong>
+                  for Dimas and Kiril with <u>-500 UAH</u>.
+                </div>
+              </div>
+            </div>
+            <div class="negative-explanation">
+              <div class="explanation-title">Positive amount</div>
+              <div class="explanation-content">
+                <div class="explanation-text">
+                  If someone bought something just for himself, you should reduce the total price of the <strong>payment</strong>
+                  on cost of this product and add <strong>positive calculation modification</strong> for known person.
+                  For example, if all group bought a lot of stuff in ATB for <u>200 UAH</u>, but Bodya got the bear just for himself
+                  for <u>100 UAH</u>, you can set the <strong>payment</strong> price for all group as <u>200 UAH</u> and add
+                  <strong>positive calculation modification</strong> for Bodya with additional <u>100 UAH</u>.
+                </div>
+
+                <img src="assets/positive-amaunt-example.PNG" alt="Negative amount example">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div class="payment-modal-btns">
+      <button mat-raised-button color="warn">Cancel</button>
+      <button mat-raised-button color="primary">Add</button>
+    </div>
+  </div>
+
+  <div mat-dialog-content *ngIf="!isCalculation">
+    <form class="payment-modal-form">
+      <mat-form-field class="users-selection" appearance="fill">
+        <mat-label>Users</mat-label>
+        <mat-select required [formControl]="usersToExcludeSelectControl" multiple>
+          <ng-template *ngIf="usersToExcludeSelect.length!==0" ngFor let-user [ngForOf]="usersToExcludeSelect">
+            <mat-option [value]="user.uid">{{ user.name }}</mat-option>
+          </ng-template>
+        </mat-select>
+      </mat-form-field>
+    </form>
+
+    <div class="payment-modal-btns">
+      <button mat-raised-button color="warn">Cancel</button>
+      <button mat-raised-button color="primary">Change</button>
+    </div>
+  </div>
+
+</div>

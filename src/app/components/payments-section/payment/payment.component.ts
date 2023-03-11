@@ -7,9 +7,13 @@ import { ToastrService } from 'ngx-toastr';
 import { FormControl, Validators } from '@angular/forms';
 import EventService from '@business/services/event.service';
 import ApplicationStateService from '@business/services/application-state.service';
-import { faArrowsRotate, faFloppyDisk, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faFloppyDisk, faTrash } from '@fortawesome/free-solid-svg-icons';
 import FirebaseEntityServiceDecorator from '@business/core/firebase/firebase-entity-service.decorator';
 import PaymentService from '@business/services/payment.service';
+import {
+  CreatePaymentModModalComponent
+} from '@app/components/payments-section/create-payment-mod-modal/create-payment-mod-modal.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-payment',
@@ -33,6 +37,7 @@ export class PaymentComponent implements OnDestroy, OnInit {
   public userServiceSubscription!: Subscription;
 
   constructor(public userService: UserService,
+              public dialog: MatDialog,
               public eventService: EventService,
               public paymentService: PaymentService,
               public applicationService: ApplicationStateService,
@@ -126,12 +131,20 @@ export class PaymentComponent implements OnDestroy, OnInit {
     }, []);
   }
 
-  ngOnDestroy(): void {
+  public openDialog(): void {
+    this.dialog.open(CreatePaymentModModalComponent, {
+      data: {
+        payment: this.payment
+      }
+    });
+  }
+
+  public ngOnDestroy(): void {
     this.userServiceSubscription.unsubscribe();
     this.eventServiceSubscription.unsubscribe();
   }
 
-  async ngOnInit(): Promise<void> {
+  public async ngOnInit(): Promise<void> {
     this.userIdSelectControl.setValue(this.payment.userUid);
     this.priceInputControl.setValue(this.payment.money);
     this.nameInputControl.setValue(this.payment.name);

@@ -27,6 +27,7 @@ import { UserComponent } from './components/users-section/user/user.component';
 import { MatCardModule } from '@angular/material/card';
 import { CreateUserModalComponent } from './components/users-section/create-user-modal/create-user-modal.component';
 import { PaymentComponent } from './components/payments-section/payment/payment.component';
+import { CreatePaymentModModalComponent } from './components/payments-section/create-payment-mod-modal/create-payment-mod-modal.component';
 
 @NgModule({
   declarations: [
@@ -41,7 +42,8 @@ import { PaymentComponent } from './components/payments-section/payment/payment.
     CreateEventModalComponent,
     UserComponent,
     CreateUserModalComponent,
-    PaymentComponent
+    PaymentComponent,
+    CreatePaymentModModalComponent
   ],
   imports: [
     BrowserModule,
@@ -59,7 +61,7 @@ import { PaymentComponent } from './components/payments-section/payment/payment.
     }),
     MatOptionModule,
     MatSelectModule,
-    MatCardModule
+    MatCardModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

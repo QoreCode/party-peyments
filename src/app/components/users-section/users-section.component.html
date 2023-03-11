@@ -12,7 +12,7 @@
   </div>
 
   <div class="members-list">
-    <div class="no-users-found" *ngIf="users.length===0">no users found</div>
+    <div class="no-users-found" *ngIf="users.length===0">No users found</div>
     <ng-template *ngIf="users.length!==0" ngFor let-user [ngForOf]="users">
       <app-user class="member-wrap" [user]="user"></app-user>
     </ng-template>

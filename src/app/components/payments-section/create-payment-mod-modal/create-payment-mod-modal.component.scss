@@ -1,0 +1,155 @@
+.payment-modal-form {
+  display: flex;
+  flex-direction: column;
+  min-width: 300px;
+  overflow: visible;
+}
+
+.payment-modal-title {
+  display: flex;
+  padding-top: 15px;
+}
+
+.payment-modal-separator {
+  margin: 0 10px;
+}
+
+.payment-modal-label {
+  color: #bbb;
+  transition: all 0.2s;
+  font-weight: 400;
+  cursor: pointer;
+  position: relative;
+  display: block;
+
+  &:after {
+    content: '';
+    width: 0;
+    height: 1px;
+    background-color: #bbb;
+    display: block;
+    transition: all 0.2s;
+    margin: auto;
+  }
+
+  &.isActive {
+    color: black;
+
+    &:after {
+      background-color: black;
+    }
+  }
+
+  &:hover {
+    &:after {
+      width: 100%;
+    }
+  }
+}
+
+.payment-modal-btns {
+  overflow: hidden;
+  display: flex;
+  margin-top: 30px;
+  justify-content: space-between;
+
+  button {
+    flex: 0.4;
+  }
+}
+
+.money-amount-field {
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  display: flex;
+
+  ::ng-deep {
+    .mat-mdc-form-field {
+      width: calc(100% - 30px);
+    }
+  }
+
+  .info-icon {
+    font-size: 22px;
+    cursor: help;
+    text-align: center;
+    width: 22px;
+    display: inline-block;
+    height: 22px;
+    color: #ccc;
+  }
+}
+
+::ng-deep {
+  .mat-mdc-dialog-title {
+    justify-content: center;
+    align-items: center;
+  }
+
+  .mat-mdc-dialog-container .mdc-dialog__surface {
+    overflow: visible;
+  }
+
+  .mat-mdc-dialog-container .mdc-dialog__content {
+    overflow: visible;
+  }
+}
+
+.information-tool {
+  position: relative;
+
+  &:hover {
+    .info-icon {
+      color: black;
+    }
+
+    .information-window {
+      display: flex;
+    }
+  }
+}
+
+.explanation-text {
+  padding-top: 60px;
+}
+
+.information-window {
+  position: absolute;
+  top: -15px;
+  transform: translateY(-100%) translateX(calc(-50% + 12px));
+  left: 0;
+  right: 0;
+  margin: auto;
+  background: white;
+  width: 1500px;
+  display: none;
+  padding: 20px;
+  justify-content: flex-start;
+  align-items: flex-start;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  color: black;
+}
+
+.explanation-title {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.explanation-content {
+  margin-top: 20px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.positive-explanation {
+  padding-right: 20px;
+  flex: 50%;
+}
+
+.negative-explanation {
+  padding-left: 20px;
+  border-left: 1px solid #ccc;
+  flex: 50%;
+}
