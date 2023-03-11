@@ -29,7 +29,17 @@
           </mat-form-field>
         </div>
         <div class="payment-date">{{ payment.dateLabel }}</div>
-        <div class="payment-update" (click)="updatePayment()">update <fa-icon [icon]="updateIcon"></fa-icon></div>
+        <div class="payment-icons">
+          <div class="payment-update" (click)="updatePayment()">
+            <span>save</span>
+            <fa-icon [icon]="saveIcon"></fa-icon>
+          </div>
+          <span class="payment-icons-separator">/</span>
+          <div class="payment-delete" (click)="deletePayment()">
+            <span>delete</span>
+            <fa-icon [icon]="deleteIcon"></fa-icon>
+          </div>
+        </div>
       </div>
     </div>
     <div class="payment-modifications">

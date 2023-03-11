@@ -7,7 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 import { FormControl, Validators } from '@angular/forms';
 import EventService from '@business/services/event.service';
 import ApplicationStateService from '@business/services/application-state.service';
-import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
+import { faArrowsRotate, faFloppyDisk, faTrash } from '@fortawesome/free-solid-svg-icons';
 import FirebaseEntityServiceDecorator from '@business/core/firebase/firebase-entity-service.decorator';
 import PaymentService from '@business/services/payment.service';
 
@@ -22,7 +22,8 @@ export class PaymentComponent implements OnDestroy, OnInit {
   public allUsers: User[] = [];
   public usersToSelect: User[] = [];
 
-  public updateIcon = faArrowsRotate;
+  public saveIcon = faFloppyDisk;
+  public deleteIcon = faTrash;
 
   public userIdSelectControl = new FormControl<string>('', [Validators.required]);
   public priceInputControl = new FormControl<number>(0, [Validators.required, Validators.min(1)]);
@@ -36,6 +37,22 @@ export class PaymentComponent implements OnDestroy, OnInit {
               public paymentService: PaymentService,
               public applicationService: ApplicationStateService,
               public toastr: ToastrService) {
+  }
+
+  public async deletePayment() {
+
+    try {
+      const fbPaymentServiceDec = new FirebaseEntityServiceDecorator(this.paymentService);
+      await fbPaymentServiceDec.deleteEntity(this.payment.uid);
+
+      this.toastr.success(`Payment successfully deleted!`);
+    } catch (e) {
+      if (e instanceof Error) {
+        this.toastr.error(e.message);
+      } else {
+        alert(e);
+      }
+    }
   }
 
   public async updatePayment() {

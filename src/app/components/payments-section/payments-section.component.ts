@@ -50,6 +50,17 @@ export class PaymentsSectionComponent implements OnDestroy, OnInit {
     // fbDec.addOrUpdateEntity(m2);
   }
 
+  public addPayment() {
+    const selectedEventUid = this.applicationStateService.getSelectedEventUid();
+    if (selectedEventUid === undefined) {
+      this.toastr.error(`No selected event found. You are scaring me!`);
+      return;
+    }
+
+    const payment = Payment.create('', '', 0, selectedEventUid);
+    this.paymentService.addOrUpdateEntity(payment);
+  }
+
   public get hasSelectedEvent(): boolean {
     return Boolean(this.applicationStateService.getSelectedEventUid());
   }
@@ -86,7 +97,8 @@ export class PaymentsSectionComponent implements OnDestroy, OnInit {
         return;
       }
 
-      this.payments = await this.paymentService.getPaymentsByEventUid(selectedEventUid);
+      this.payments = (await this.paymentService.getPaymentsByEventUid(selectedEventUid))
+        .sort((a, b) => b.date - a.date);
     });
 
     this.paymentSubscription = this.paymentService.subscribe(async (payments: Map<string, Payment>) => {
@@ -95,7 +107,8 @@ export class PaymentsSectionComponent implements OnDestroy, OnInit {
         return;
       }
 
-      this.payments = await this.paymentService.getPaymentsByEventUid(selectedEventUid);
+      this.payments = (await this.paymentService.getPaymentsByEventUid(selectedEventUid))
+        .sort((a, b) => b.date - a.date);
     });
   }
 }

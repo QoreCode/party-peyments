@@ -58,6 +58,10 @@ export default class Payment extends Model {
     this._name = name;
   }
 
+  public get date(): number {
+    return this._date;
+  }
+
   public toJson(): Record<string, any> {
     return {
       uid: this.uid,
