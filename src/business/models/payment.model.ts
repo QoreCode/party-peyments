@@ -1,10 +1,10 @@
 import Model from '../core/model';
 
 export default class Payment extends Model {
-  private readonly _name: string;
+  private _name: string;
   private readonly _date: number;
-  private readonly _money: number;
-  private readonly _userUid: string;
+  private _money: number;
+  private _userUid: string;
   private readonly _eventUid: string;
 
   public constructor(uid: string, name: string, userUid: string, money: number, eventUid: string, date: number) {
@@ -29,6 +29,10 @@ export default class Payment extends Model {
     return this._money;
   }
 
+  public set money(money: number) {
+    this._money = money;
+  }
+
   public get dateLabel(): string {
     const date = new Date(this._date);
     return `${ date.getDate() }.${ date.getMonth() + 1 }.${ date.getFullYear() } ${ date.getHours() }:${ date.getMinutes() }`;
@@ -42,8 +46,16 @@ export default class Payment extends Model {
     return this._userUid;
   }
 
+  public set userUid(userUid: string) {
+    this._userUid = userUid;
+  }
+
   public get name(): string {
     return this._name;
+  }
+
+  public set name(name: string) {
+    this._name = name;
   }
 
   public toJson(): Record<string, any> {

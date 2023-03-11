@@ -4,9 +4,12 @@ import User from '@business/models/user.model';
 import UserService from '@business/services/user.service';
 import { Subscription } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
-import { FormControl } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
 import EventService from '@business/services/event.service';
 import ApplicationStateService from '@business/services/application-state.service';
+import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
+import FirebaseEntityServiceDecorator from '@business/core/firebase/firebase-entity-service.decorator';
+import PaymentService from '@business/services/payment.service';
 
 @Component({
   selector: 'app-payment',
@@ -19,21 +22,68 @@ export class PaymentComponent implements OnDestroy, OnInit {
   public allUsers: User[] = [];
   public usersToSelect: User[] = [];
 
-  public userIdsInputControl = new FormControl<string>('');
-  public priceInputControl = new FormControl<number>(0);
-  public nameInputControl = new FormControl<string>('');
+  public updateIcon = faArrowsRotate;
+
+  public userIdSelectControl = new FormControl<string>('', [Validators.required]);
+  public priceInputControl = new FormControl<number>(0, [Validators.required, Validators.min(1)]);
+  public nameInputControl = new FormControl<string>('', [Validators.required, Validators.minLength(4)]);
 
   public eventServiceSubscription!: Subscription;
   public userServiceSubscription!: Subscription;
 
   constructor(public userService: UserService,
               public eventService: EventService,
+              public paymentService: PaymentService,
               public applicationService: ApplicationStateService,
               public toastr: ToastrService) {
   }
 
-  public changeUser() {
-    // lol
+  public async updatePayment() {
+    if (!this.userIdSelectControl.valid) {
+      this.toastr.error('User is required for payment entity');
+      return;
+    }
+
+    if (!this.priceInputControl.valid) {
+      this.toastr.error(`Price is required for payment entity. It's also should have 1 number or more`);
+      return;
+    }
+
+    if (!this.nameInputControl.valid) {
+      this.toastr.error(`Name is required for payment entity. It's also should have 4 letters or more`);
+      return;
+    }
+
+    const userUid = this.userIdSelectControl.getRawValue();
+    const price = this.priceInputControl.getRawValue();
+    const name = this.nameInputControl.getRawValue();
+
+    if (userUid === null || price === null || name === null) {
+      this.toastr.error(`Value in payment card is corrupted`);
+      return;
+    }
+
+    if (userUid === this.payment.userUid && price === this.payment.money && name === this.payment.name) {
+      this.toastr.error(`Nothing is changed`);
+      return;
+    }
+
+    this.payment.name = name;
+    this.payment.userUid = userUid;
+    this.payment.money = price;
+
+    try {
+      const fbPaymentServiceDec = new FirebaseEntityServiceDecorator(this.paymentService);
+      await fbPaymentServiceDec.addOrUpdateEntity(this.payment);
+
+      this.toastr.success(`Payment successfully updated!`);
+    } catch (e) {
+      if (e instanceof Error) {
+        this.toastr.error(e.message);
+      } else {
+        alert(e);
+      }
+    }
   }
 
   public async setUsersToSelect() {
@@ -65,7 +115,7 @@ export class PaymentComponent implements OnDestroy, OnInit {
   }
 
   async ngOnInit(): Promise<void> {
-    this.userIdsInputControl.setValue(this.payment.userUid);
+    this.userIdSelectControl.setValue(this.payment.userUid);
     this.priceInputControl.setValue(this.payment.money);
     this.nameInputControl.setValue(this.payment.name);
 
