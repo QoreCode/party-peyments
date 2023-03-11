@@ -36,10 +36,9 @@
   display: flex;
   justify-content: center;
   align-items: baseline;
+  color: #D50000;
 
   &:hover {
-    color: #D50000;
-
     .ng-fa-icon {
       animation: 0.6s linear 0s infinite shake;
     }
@@ -60,10 +59,9 @@
   display: flex;
   justify-content: center;
   align-items: baseline;
+  color: #304FFE;
 
   &:hover {
-    color: #304FFE;
-
     .ng-fa-icon {
       animation: 1.2s linear 0s infinite rotate;
     }
