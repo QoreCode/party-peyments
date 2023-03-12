@@ -81,17 +81,17 @@ export class PaymentComponent implements OnDestroy, OnInit {
     }
 
     if (!this.userIdSelectControl.valid) {
-      this.toastr.error('User is required for payment entity');
+      this.userIdSelectControl.markAsTouched();
       return;
     }
 
     if (!this.priceInputControl.valid) {
-      this.toastr.error(`Price is required for payment entity. It's also should have 1 number or more`);
+      this.priceInputControl.markAsTouched();
       return;
     }
 
     if (!this.nameInputControl.valid) {
-      this.toastr.error(`Name is required for payment entity. It's also should have 4 letters or more`);
+      this.nameInputControl.markAsTouched();
       return;
     }
 
