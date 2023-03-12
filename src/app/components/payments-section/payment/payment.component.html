@@ -30,23 +30,25 @@
         </div>
         <div class="payment-date">{{ payment.dateLabel }}</div>
         <div class="payment-icons">
-          <div class="payment-update" (click)="updatePayment()">
+          <div class="payment-update" [ngClass]="{disable: isSaveDisable}" (click)="updatePayment()">
             <span>save</span>
             <fa-icon [icon]="saveIcon"></fa-icon>
           </div>
           <span class="payment-icons-separator">/</span>
-          <div class="payment-delete" (click)="deletePayment()">
-            <span>delete</span>
-            <fa-icon [icon]="deleteIcon"></fa-icon>
+          <div class="delete-user"
+               mwlConfirmationPopover
+               [popoverTitle]="'Deleting payment'"
+               [popoverMessage]="'Are you really want to delete this payment?'"
+               placement="left"
+               (confirm)="deletePayment()">
+            <div class="payment-delete">
+              <span>delete</span>
+              <fa-icon [icon]="deleteIcon"></fa-icon>
+            </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="payment-modifications">
-      <div class="no-modifications">
-        <div class="no-mods-text">No modification found for this payment ticket</div>
-        <div class="no-mods-btn" (click)="openDialog()">Add one</div>
-      </div>
-    </div>
+    <app-payment-modifications [payment]="payment"></app-payment-modifications>
   </mat-card-content>
 </mat-card>

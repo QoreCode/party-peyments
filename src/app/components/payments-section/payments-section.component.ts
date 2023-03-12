@@ -7,6 +7,8 @@ import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import FirebaseEntityServiceDecorator from '@business/core/firebase/firebase-entity-service.decorator';
 import Payment from '@business/models/payment.model';
 import PaymentService from '@business/services/payment.service';
+import ExcludeModificationService from '@business/services/exclude-modification.service';
+import CalculationModificationService from '@business/services/calculation-modification.service';
 
 @Component({
   selector: 'app-payments-section',
@@ -25,11 +27,19 @@ export class PaymentsSectionComponent implements OnDestroy, OnInit {
 
   constructor(public applicationStateService: ApplicationStateService,
               public toastr: ToastrService,
+              public excludeModificationService: ExcludeModificationService,
+              public calculationModificationService: CalculationModificationService,
               public paymentService: PaymentService,
               public eventService: EventService) {
 
-    const fbDec = new FirebaseEntityServiceDecorator(this.paymentService);
-    fbDec.getEntities();
+    const fbPaymentDec = new FirebaseEntityServiceDecorator(this.paymentService);
+    fbPaymentDec.getEntities();
+
+    const fbExcludeModDec = new FirebaseEntityServiceDecorator(this.excludeModificationService);
+    fbExcludeModDec.getEntities();
+
+    const fbCalcModDec = new FirebaseEntityServiceDecorator(this.calculationModificationService);
+    fbCalcModDec.getEntities();
   }
 
   public get hasPayments(): boolean {

@@ -1,8 +1,8 @@
 import Model from '@business/core/model';
 
 export default class PositiveCalculationModification extends Model {
-  protected readonly _mathExpression: number;
-  protected readonly _usersUid: string[];
+  protected _mathExpression: number;
+  protected _usersUid: string[];
   protected _paymentUid: string;
 
   public constructor(uid: string, paymentUid: string, usersUid: string[], mathExpression: number) {
@@ -24,13 +24,37 @@ export default class PositiveCalculationModification extends Model {
     return this._paymentUid;
   }
 
+  public get usersUid(): string[] {
+    return this._usersUid;
+  }
+
+  public set usersUid(userUids: string[]) {
+    this._usersUid = userUids;
+  }
+
+  public get mathExpression(): number {
+    return this._mathExpression;
+  }
+
+  public set mathExpression(mathExpression: number) {
+    this._mathExpression = mathExpression;
+  }
+
+  public isUserInvolved(userUid: string): boolean {
+    return this._usersUid.some((existedUserUid: string) => existedUserUid === userUid);
+  }
+
+  public removeUser(userUid: string): void {
+    this._usersUid = this._usersUid.filter((existedUserUid: string) => existedUserUid !== userUid);
+  }
+
   public applyModification(membersMap: Map<string, number>): Map<string, number> {
     const paymentPerUser = Math.round(this._mathExpression / this._usersUid.length);
 
     for (const userUid of this._usersUid) {
       const memberPayment = membersMap.get(userUid);
       if (memberPayment === undefined) {
-        throw new Error(`Member with id ${userUid} doesn't exist in the members collection`);
+        throw new Error(`Member with id ${ userUid } doesn't exist in the members collection`);
       }
 
       membersMap.set(userUid, memberPayment + paymentPerUser);
@@ -42,9 +66,9 @@ export default class PositiveCalculationModification extends Model {
 
   public toJson(): Record<string, any> {
     return {
-      id: this.uid,
+      uid: this.uid,
       paymentUid: this._paymentUid,
-      userUid: this._usersUid,
+      usersUid: this._usersUid,
       mathExpression: this._mathExpression
     }
   }

@@ -1,7 +1,7 @@
 .payment-modal-form {
   display: flex;
   flex-direction: column;
-  min-width: 300px;
+  min-width: 350px;
   overflow: visible;
 }
 
@@ -117,12 +117,12 @@
 .information-window {
   position: absolute;
   top: -15px;
-  transform: translateY(-100%) translateX(calc(-50% + 12px));
+  transform: translateY(-100%) translateX(calc(-55% + 12px));
   left: 0;
   right: 0;
   margin: auto;
   background: white;
-  width: 1500px;
+  width: 1600px;
   display: none;
   padding: 20px;
   justify-content: flex-start;
@@ -152,4 +152,12 @@
   padding-left: 20px;
   border-left: 1px solid #ccc;
   flex: 50%;
+}
+
+.exclude-inform {
+  max-width: 350px;
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.3em;
+  color: #D50000;
 }

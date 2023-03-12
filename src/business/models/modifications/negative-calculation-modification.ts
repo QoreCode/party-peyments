@@ -1,8 +1,8 @@
 import Model from '@business/core/model';
 
 export default class NegativeCalculationModification extends Model {
-  protected readonly _mathExpression: number;
-  protected readonly _usersUid: string[];
+  protected _mathExpression: number;
+  protected _usersUid: string[];
   protected _paymentUid: string;
 
   public constructor(uid: string, paymentUid: string, usersUid: string[], mathExpression: number) {
@@ -22,6 +22,30 @@ export default class NegativeCalculationModification extends Model {
 
   public get paymentUid(): string {
     return this._paymentUid;
+  }
+
+  public get usersUid(): string[] {
+    return this._usersUid;
+  }
+
+  public set usersUid(userUids: string[]) {
+    this._usersUid = userUids;
+  }
+
+  public get mathExpression(): number {
+    return this._mathExpression;
+  }
+
+  public set mathExpression(mathExpression: number) {
+    this._mathExpression = mathExpression;
+  }
+
+  public isUserInvolved(userUid: string): boolean {
+    return this._usersUid.some((existedUserUid: string) => existedUserUid === userUid);
+  }
+
+  public removeUser(userUid: string): void {
+    this._usersUid = this._usersUid.filter((existedUserUid: string) => existedUserUid !== userUid);
   }
 
   // user - current modification user
@@ -53,9 +77,9 @@ export default class NegativeCalculationModification extends Model {
 
   public toJson(): Record<string, any> {
     return {
-      id: this.uid,
+      uid: this.uid,
       paymentUid: this._paymentUid,
-      userUid: this._usersUid,
+      usersUid: this._usersUid,
       mathExpression: this._mathExpression
     }
   }

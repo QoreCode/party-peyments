@@ -15,16 +15,22 @@ export default class CalculationModificationService extends EntityService<Calcul
     return (await this.getEntities()).filter((entity) => entity.paymentUid === paymentUid)
   }
 
+  public async getEntitiesByPaymentAndUserId(paymentUid: string, userUid: string): Promise<CalculationModification[]> {
+    return (await this.getEntities()).filter((entity: CalculationModification) => {
+      return entity.paymentUid === paymentUid && entity.isUserInvolved(userUid);
+    })
+  }
+
   public createFromJson(data: Record<string, any>): CalculationModification {
     const uid = this.extractValue(data, 'uid');
     const paymentUid = this.extractValue(data, 'paymentUid');
-    const userUid = this.extractValue(data, 'userUid');
+    const usersUid = this.extractValue(data, 'usersUid');
     const mathExpression = this.extractValue(data, 'mathExpression');
 
     if (mathExpression > 0) {
-      return new PositiveCalculationModification(uid, paymentUid, userUid, mathExpression);
+      return new PositiveCalculationModification(uid, paymentUid, usersUid, mathExpression);
     }
 
-    return new NegativeCalculationModification(uid, paymentUid, userUid, mathExpression);
+    return new NegativeCalculationModification(uid, paymentUid, usersUid, mathExpression);
   }
 }

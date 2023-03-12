@@ -15,7 +15,10 @@
         <mat-label>Users</mat-label>
         <mat-select required [formControl]="usersToCalcSelectControl" multiple>
           <ng-template *ngIf="usersToCalcSelect.length!==0" ngFor let-user [ngForOf]="usersToCalcSelect">
-            <mat-option [value]="user.uid">{{ user.name }}</mat-option>
+            <mat-option [value]="user.uid" [disabled]="isDisabledUser(user)">
+              <span>{{ user.name }}</span>
+              <fa-icon *ngIf="isDisabledUser(user)" [icon]="infoIcon" [title]="getOptionHelpTitle(user)" class="info-icon"></fa-icon>
+            </mat-option>
           </ng-template>
         </mat-select>
       </mat-form-field>
@@ -55,7 +58,7 @@
                   <strong>positive calculation modification</strong> for Bodya with additional <u>100 UAH</u>.
                 </div>
 
-                <img [src]="'party-peyments/assets/positive-amaunt-example.PNG'" alt="Negative amount example">
+                <img [src]="'party-peyments/assets/positive-amaunt-example.PNG'" alt="Positive amount example">
               </div>
             </div>
           </div>
@@ -64,8 +67,10 @@
     </form>
 
     <div class="payment-modal-btns">
-      <button mat-raised-button color="warn">Cancel</button>
-      <button mat-raised-button color="primary">Add</button>
+      <button mat-raised-button color="warn" (click)="onCancelClick()">Cancel</button>
+      <button mat-raised-button color="primary" (click)="saveCalcMod()">
+        {{data.modification === undefined ? 'Add' : 'Update'}}
+      </button>
     </div>
   </div>
 
@@ -81,9 +86,11 @@
       </mat-form-field>
     </form>
 
+    <div class="exclude-inform">Selected users will be removed from all calculation modifications</div>
+
     <div class="payment-modal-btns">
-      <button mat-raised-button color="warn">Cancel</button>
-      <button mat-raised-button color="primary">Change</button>
+      <button mat-raised-button color="warn" (click)="onCancelClick()">Cancel</button>
+      <button mat-raised-button color="primary" (click)="saveExcludedUsers()">Change</button>
     </div>
   </div>
 

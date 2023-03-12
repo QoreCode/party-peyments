@@ -23,6 +23,10 @@ export default class ExcludeModification extends Model {
     return this._paymentUid;
   }
 
+  public get userUid(): string {
+    return this._userUid;
+  }
+
   public applyModification(membersMap: Map<string, User>): Map<string, User> {
     if (!membersMap.has(this._userUid)) {
       throw new Error(`Member with id ${ this._userUid } doesn't exist in the members collection`);
@@ -35,7 +39,7 @@ export default class ExcludeModification extends Model {
 
   public toJson(): Record<string, any> {
     return {
-      id: this.uid,
+      uid: this.uid,
       paymentUid: this._paymentUid,
       userUid: this._userUid
     }

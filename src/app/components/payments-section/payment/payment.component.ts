@@ -10,10 +10,9 @@ import ApplicationStateService from '@business/services/application-state.servic
 import { faFloppyDisk, faTrash } from '@fortawesome/free-solid-svg-icons';
 import FirebaseEntityServiceDecorator from '@business/core/firebase/firebase-entity-service.decorator';
 import PaymentService from '@business/services/payment.service';
-import {
-  CreatePaymentModModalComponent
-} from '@app/components/payments-section/create-payment-mod-modal/create-payment-mod-modal.component';
-import { MatDialog } from '@angular/material/dialog';
+import ExcludeModificationService from '@business/services/exclude-modification.service';
+import ExcludeModification from '@business/models/modifications/exclude-modification';
+import CalculationModificationService, { CalculationModification } from '@business/services/calculation-modification.service';
 
 @Component({
   selector: 'app-payment',
@@ -37,16 +36,32 @@ export class PaymentComponent implements OnDestroy, OnInit {
   public userServiceSubscription!: Subscription;
 
   constructor(public userService: UserService,
-              public dialog: MatDialog,
               public eventService: EventService,
               public paymentService: PaymentService,
               public applicationService: ApplicationStateService,
+              public excludeModificationService: ExcludeModificationService,
+              public calculationModificationService: CalculationModificationService,
               public toastr: ToastrService) {
   }
 
   public async deletePayment() {
-
     try {
+      const excludeModifications = await this.excludeModificationService.getEntitiesByPaymentId(this.payment.uid);
+      if (excludeModifications.length) {
+        const fbExcludeServiceDec = new FirebaseEntityServiceDecorator(this.excludeModificationService);
+        await Promise.all(excludeModifications.map((excludeModification: ExcludeModification) => {
+          return fbExcludeServiceDec.deleteEntity(excludeModification.uid);
+        }));
+      }
+
+      const calculationModifications = await this.calculationModificationService.getEntitiesByPaymentId(this.payment.uid);
+      if (calculationModifications.length) {
+        const fbExcludeServiceDec = new FirebaseEntityServiceDecorator(this.calculationModificationService);
+        await Promise.all(calculationModifications.map((calculationModification: CalculationModification) => {
+          return fbExcludeServiceDec.deleteEntity(calculationModification.uid);
+        }));
+      }
+
       const fbPaymentServiceDec = new FirebaseEntityServiceDecorator(this.paymentService);
       await fbPaymentServiceDec.deleteEntity(this.payment.uid);
 
@@ -61,6 +76,10 @@ export class PaymentComponent implements OnDestroy, OnInit {
   }
 
   public async updatePayment() {
+    if (this.isSaveDisable) {
+      return;
+    }
+
     if (!this.userIdSelectControl.valid) {
       this.toastr.error('User is required for payment entity');
       return;
@@ -87,6 +106,9 @@ export class PaymentComponent implements OnDestroy, OnInit {
 
     if (userUid === this.payment.userUid && price === this.payment.money && name === this.payment.name) {
       this.toastr.error(`Nothing is changed`);
+      this.userIdSelectControl.markAsUntouched();
+      this.priceInputControl.markAsUntouched();
+      this.nameInputControl.markAsUntouched();
       return;
     }
 
@@ -99,6 +121,10 @@ export class PaymentComponent implements OnDestroy, OnInit {
       await fbPaymentServiceDec.addOrUpdateEntity(this.payment);
 
       this.toastr.success(`Payment successfully updated!`);
+
+      this.userIdSelectControl.markAsUntouched();
+      this.priceInputControl.markAsUntouched();
+      this.nameInputControl.markAsUntouched();
     } catch (e) {
       if (e instanceof Error) {
         this.toastr.error(e.message);
@@ -131,12 +157,8 @@ export class PaymentComponent implements OnDestroy, OnInit {
     }, []);
   }
 
-  public openDialog(): void {
-    this.dialog.open(CreatePaymentModModalComponent, {
-      data: {
-        payment: this.payment
-      }
-    });
+  public get isSaveDisable() {
+    return !this.userIdSelectControl.touched && !this.priceInputControl.touched && !this.nameInputControl.touched;
   }
 
   public ngOnDestroy(): void {
