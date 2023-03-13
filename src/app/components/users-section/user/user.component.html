@@ -16,7 +16,12 @@
 
 <mat-card class="related-users-wrap" [ngClass]="{isOpened: isOpened}">
   <div class="payed-for">
-    <div *ngIf="isNobodyToSelect ; else elseBlock" class="no-user-text">No users you can pay for</div>
+    <div *ngIf="isSomeonePayedForThisUser ; else isNobodyToSelectBlock" class="no-user-text">
+      {{ payedUserName }} already payed for you
+    </div>
+    <ng-template #isNobodyToSelectBlock>
+      <div *ngIf="isNobodyToSelect ; else elseBlock" class="no-user-text">No users you can pay for</div>
+    </ng-template>
     <ng-template #elseBlock>
       <div class="payed-for-label">Pay for:</div>
       <mat-form-field class="users-selection" appearance="fill" [title]='usersTitle'>
@@ -24,7 +29,8 @@
           <ng-template *ngIf="usersToSelect.length!==0" ngFor let-user [ngForOf]="usersToSelect">
             <mat-option [value]="user.uid" [disabled]="isDisabledOption(user.uid)">
               <span>{{ user.name }}</span>
-              <fa-icon *ngIf="isDisabledOption(user.uid)" [icon]="infoIcon" [title]="getOptionHelpTitle(user.uid)" class="info-icon"></fa-icon>
+              <fa-icon *ngIf="isDisabledOption(user.uid)" [icon]="infoIcon" [title]="getOptionHelpTitle(user.uid)"
+                       class="info-icon"></fa-icon>
             </mat-option>
           </ng-template>
         </mat-select>

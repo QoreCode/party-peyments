@@ -15,7 +15,7 @@ export default class FirebaseEntityServiceDecorator<TEntity extends Model> imple
     const dbInstance = Firebase.getInstance().db;
     await set(ref(dbInstance, `${ this.entityService.tableName }/${ entity.uid }`), entity.toJson());
 
-    this.entityService.addOrUpdateEntity(entity);
+    this.entityService.addOrUpdateEntity(entity, true);
   }
 
   // TODO: костыль. Глянуть как сохранять коллекции
@@ -37,7 +37,7 @@ export default class FirebaseEntityServiceDecorator<TEntity extends Model> imple
     return new Promise((resolve) => {
       onValue(starCountRef, (snapshot) => {
         const entity = this.entityService.createFromJson(snapshot.val());
-        this.entityService.addOrUpdateEntity(entity);
+        this.entityService.addOrUpdateEntity(entity, true);
 
         resolve(entity);
       });

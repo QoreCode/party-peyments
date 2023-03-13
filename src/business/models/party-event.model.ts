@@ -60,6 +60,20 @@ export default class PartyEvent extends Model {
     return this._usersEventProperties.find((usersEventProperties: UserEventProperties) => usersEventProperties.userUid === userUid);
   }
 
+  public isUserInvolved(userUid: string): boolean {
+    return this._usersEventProperties.some((usersEventProperties: UserEventProperties) => usersEventProperties.userUid === userUid);
+  }
+
+  public findWhoPayedForUser(userUid: string): string | undefined {
+    for (const usersEventProperties of this._usersEventProperties) {
+      if (usersEventProperties.hasPayedUserUid(userUid)) {
+        return usersEventProperties.userUid;
+      }
+    }
+
+    return undefined;
+  }
+
   public get dataLabel(): string {
     const date = new Date(this._date);
     return `${ date.getDate() }.${ date.getMonth() + 1 }.${ date.getFullYear() }`;

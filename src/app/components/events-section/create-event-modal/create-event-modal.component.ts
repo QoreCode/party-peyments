@@ -7,6 +7,7 @@ import PartyEvent from '@business/models/party-event.model';
 import { ToastrService } from 'ngx-toastr';
 import UserService from '@business/services/user.service';
 import User from '@business/models/user.model';
+import ApplicationStateService from '@business/services/application-state.service';
 
 @Component({
   selector: 'app-create-event-modal',
@@ -21,6 +22,7 @@ export class CreateEventModalComponent {
 
   constructor(public dialogRef: MatDialogRef<CreateEventModalComponent>,
               public toastr: ToastrService,
+              private applicationStateService: ApplicationStateService,
               public eventService: EventService,
               public userService: UserService
   ) {
@@ -49,8 +51,11 @@ export class CreateEventModalComponent {
       return;
     }
 
+    const event = PartyEvent.create(eventName, eventUserIds);
     const eventServiceFBDec = new FirebaseEntityServiceDecorator(this.eventService);
-    await eventServiceFBDec.addOrUpdateEntity(PartyEvent.create(eventName, eventUserIds));
+    await eventServiceFBDec.addOrUpdateEntity(event);
+
+    this.applicationStateService.setSelectedEventUid(event.uid);
 
     this.toastr.success('Event was successfully created');
     this.dialogRef.close();

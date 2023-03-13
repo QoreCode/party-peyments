@@ -5,6 +5,7 @@ import { deleteApp } from '@firebase/app';
 export default class Firebase {
   private static _instance: Firebase;
   private _database?: Database;
+  private _databaseURL?: string;
 
   private constructor() {
   }
@@ -17,8 +18,13 @@ export default class Firebase {
     return Firebase._instance;
   }
 
+  public get databaseURL(): string | undefined {
+    return this._databaseURL;
+  }
+
   public initialize(databaseURL: string): void {
-    const app = initializeApp({ databaseURL });
+    const app = initializeApp({ databaseURL: `https://${ databaseURL }.firebasedatabase.app/` });
+    this._databaseURL = databaseURL;
 
     try {
       this._database = getDatabase(app);

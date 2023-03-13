@@ -6,13 +6,15 @@ export default class Payment extends Model {
   private _money: number;
   private _userUid: string;
   private readonly _eventUid: string;
+  private _isNew: boolean = true;
 
-  public constructor(uid: string, name: string, userUid: string, money: number, eventUid: string, date: number) {
+  public constructor(uid: string, name: string, userUid: string, money: number, eventUid: string, date: number, isNew: boolean) {
     super(uid);
 
     this._name = name;
     this._userUid = userUid;
     this._money = money;
+    this._isNew = isNew;
     this._date = date;
     this._eventUid = eventUid;
   }
@@ -22,7 +24,7 @@ export default class Payment extends Model {
     // @ts-ignore
     const uid = self.crypto.randomUUID();
     const date = Date.now();
-    return new Payment(uid, name, userUid, money, eventUid, date);
+    return new Payment(uid, name, userUid, money, eventUid, date, true);
   }
 
   public get money(): number {
@@ -31,6 +33,14 @@ export default class Payment extends Model {
 
   public set money(money: number) {
     this._money = money;
+  }
+
+  public get isNew(): boolean {
+    return this._isNew;
+  }
+
+  public set isNew(isNew: boolean) {
+    this._isNew = isNew;
   }
 
   public get dateLabel(): string {
@@ -66,6 +76,7 @@ export default class Payment extends Model {
     return {
       uid: this.uid,
       name: this._name,
+      isNew: this._isNew,
       userUid: this._userUid,
       money: this._money,
       date: this._date,

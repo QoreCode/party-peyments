@@ -14,8 +14,10 @@
       <div>No users found</div>
       <div class="no-users-found-button" (click)="openDialog()">Add one</div>
     </div>
-    <ng-template *ngIf="users.length!==0" ngFor let-user [ngForOf]="users">
-      <app-user class="member-wrap" [user]="user"></app-user>
-    </ng-template>
+    <div class="members-list-wrap" *ngIf="users.length!==0">
+      <ng-template ngFor let-user [ngForOf]="users">
+        <app-user class="member-wrap" [user]="user"></app-user>
+      </ng-template>
+    </div>
   </div>
 </div>

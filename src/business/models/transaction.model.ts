@@ -6,6 +6,7 @@ export default class Transaction extends Model {
   private _money: number;
   private _to: User;
   private _from: User;
+  private _resonPrefix?: string;
   private readonly _payment: Payment;
   private readonly _eventUid: string
 
@@ -51,12 +52,25 @@ export default class Transaction extends Model {
     this._money = money;
   }
 
+  public get eventUid(): string {
+    return this._eventUid;
+  }
+
   public get payment(): Payment {
     return this._payment;
   }
 
   public getText(): string {
     return `${ this.payment.name }: '${ this._from.name }' должен(на) скинуть '${ this._to.name }' ${ this._money }грн`;
+  }
+
+  public changePayer(payer: User | undefined): void {
+    if (payer === undefined) {
+      return;
+    }
+
+    this._resonPrefix = `Payed for ${ this._from.name }: `;
+    this._from = payer;
   }
 
   public toJson(): Record<string, any> {

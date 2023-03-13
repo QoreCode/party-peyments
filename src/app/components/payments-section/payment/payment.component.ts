@@ -29,7 +29,7 @@ export class PaymentComponent implements OnDestroy, OnInit {
   public deleteIcon = faTrash;
 
   public userIdSelectControl = new FormControl<string>('', [Validators.required]);
-  public priceInputControl = new FormControl<number>(0, [Validators.required, Validators.min(1)]);
+  public priceInputControl = new FormControl<number>(0, [Validators.required, Validators.min(0)]);
   public nameInputControl = new FormControl<string>('', [Validators.required, Validators.minLength(4)]);
 
   public eventServiceSubscription!: Subscription;

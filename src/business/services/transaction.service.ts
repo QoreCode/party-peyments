@@ -28,13 +28,22 @@ export default class TransactionService extends EntityService<Transaction> {
   }
 
   // TODO: refactor this shit
-  public async createTransactions(eventUid: string): Promise<void> {
-    const payments = await this._paymentService.getEntities();
+  public async createTransactions(eventUid: string): Promise<Transaction[]> {
+    const event = await this._eventService.getEntityByUid(eventUid);
+    if (event === undefined) {
+      throw new Error('No event exist');
+    }
+
+    const payments = (await this._paymentService.getEntities()).filter((payment: Payment) => {
+      return payment.eventUid === event.uid;
+    });
     if (payments.length === 0) {
       throw new Error('No payments exist');
     }
 
-    const users = await this._userService.getEntities();
+    const users = (await this._userService.getEntities()).filter((user: User) => {
+      return event.isUserInvolved(user.uid);
+    });
     if (users.length === 0) {
       throw new Error('No user exist');
     }
@@ -70,28 +79,38 @@ export default class TransactionService extends EntityService<Transaction> {
       this.generateTransactions(membersPaymentMap, payedUser, payment, eventUid);
     }
 
+
     const usersMap = new Map(users.map((user => [user.uid, user])));
     await this.replacePaymentMembers(usersMap);
+
+    return this.getEntities();
   }
 
-  public generateTransactions(membersPaymentMap: Map<User, number>, toUser: User, payment: Payment, eventUid: string): void {
+  private generateTransactions(membersPaymentMap: Map<User, number>, toUser: User, payment: Payment, eventUid: string): void {
     for (const [fromUser, memberPayment] of Array.from(membersPaymentMap.entries())) {
       if (fromUser.uid === toUser.uid) {
         continue;
       }
 
       const transaction = Transaction.create(memberPayment, payment, toUser, fromUser, eventUid);
-      this.addOrUpdateEntity(transaction);
+      this.addOrUpdateEntity(transaction, false);
     }
   }
 
-  public async replacePaymentMembers(usersCollection: Map<string, User>): Promise<void> {
+  private async replacePaymentMembers(usersCollection: Map<string, User>): Promise<void> {
     for (const transaction of await this.getEntities()) {
-      transaction.to = usersCollection.get(transaction.to.payerId) ?? transaction.to;
-      transaction.from = usersCollection.get(transaction.from.payerId) ?? transaction.from;
+      const event = await this._eventService.getEntityByUid(transaction.eventUid);
+      if (event === undefined) {
+        throw new Error(`Can't find event with id ${ transaction.eventUid }`);
+      }
 
-      if (transaction.to.uid === transaction.from.uid) {
-        this.deleteEntity(transaction.uid);
+      const userWhoPayedUid = event.findWhoPayedForUser(transaction.from.uid);
+      if (userWhoPayedUid !== undefined) {
+        if (transaction.to.uid === userWhoPayedUid) {
+          this.deleteEntity(transaction.uid)
+        } else {
+          transaction.changePayer(usersCollection.get(userWhoPayedUid));
+        }
       }
     }
   }

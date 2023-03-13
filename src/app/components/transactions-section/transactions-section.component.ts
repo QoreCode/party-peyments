@@ -5,6 +5,7 @@ import EventService from '@business/services/event.service';
 import { Subscription } from 'rxjs';
 import Payment from '@business/models/payment.model';
 import PaymentService from '@business/services/payment.service';
+import TransactionService from '@business/services/transaction.service';
 
 @Component({
   selector: 'app-transactions-section',
@@ -21,6 +22,7 @@ export class TransactionsSectionComponent implements OnDestroy, OnInit {
 
   constructor(public applicationStateService: ApplicationStateService,
               public paymentService: PaymentService,
+              public transactionService: TransactionService,
               public eventService: EventService,
               public toastr: ToastrService) {
   }
@@ -77,8 +79,14 @@ export class TransactionsSectionComponent implements OnDestroy, OnInit {
 
       this.setHasAttachedUsers();
 
+      // setTimeout(async () => {
+      //   const trans = await this.transactionService.createTransactions(selectedEventUid);
+      //   console.log(trans.filter((tran) => tran.from.name === 'Володька'));
+      // }, 234);
+
       this.payments = (await this.paymentService.getPaymentsByEventUid(selectedEventUid))
         .sort((a, b) => b.date - a.date);
     });
+
   }
 }

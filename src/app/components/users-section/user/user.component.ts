@@ -212,6 +212,25 @@ export class UserComponent implements OnDestroy, OnInit {
     return this.usersToSelect.length === this.disabledUsers.size;
   }
 
+  public get isSomeonePayedForThisUser(): boolean {
+    if (this.currentEvent === undefined) return false;
+    return this.currentEvent.findWhoPayedForUser(this.user.uid) !== undefined;
+  }
+
+  public get payedUserName(): string {
+    const payedUserUid = this.currentEvent.findWhoPayedForUser(this.user.uid);
+    if (payedUserUid === undefined) {
+      return 'Some user';
+    }
+
+    const payedUser = this.allUsers.find((user: User) => user.uid === payedUserUid);
+    if (payedUser === undefined) {
+      return 'Some user';
+    }
+
+    return payedUser.name;
+  }
+
   public ngOnDestroy(): void {
     this.usersSubscription.unsubscribe();
     this.eventsSubscription.unsubscribe();

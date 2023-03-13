@@ -16,7 +16,7 @@ import UserEventProperties from '@business/models/user-event-properties.model';
 })
 export class CreateUserModalComponent {
   public nameInputControl = new FormControl('', [
-    Validators.required, Validators.minLength(4), Validators.maxLength(200)]);
+    Validators.required, Validators.minLength(3), Validators.maxLength(200)]);
   public userIdsInputControl = new FormControl<string[]>([], [Validators.required]);
   public isNewUserState: boolean = false;
   public users: User[] = [];

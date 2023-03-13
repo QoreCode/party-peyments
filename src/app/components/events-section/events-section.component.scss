@@ -1,17 +1,40 @@
 .events-wrap {
   display: flex;
   align-items: center;
-  padding: 14px 0 14px 0;
+  padding: 14px 0 0;
 }
 
 .events-title {
   font-size: 16px;
+  padding: 0 0 14px;
+}
+
+.add-btn {
+  padding-bottom: 14px;
 }
 
 .events-list {
   display: flex;
-  padding: 0 20px;
-  flex: 1;
+  padding: 0 20px 14px 10px;
+  margin-left: 20px;
+  overflow: auto;
+  max-width: 1130px;
+
+  &::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+    background-color: #F5F5F5;
+    border-radius: 25px;
+  }
+
+  &::-webkit-scrollbar {
+    height: 6px;
+    background-color: #F5F5F5;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 25px;
+  }
 
   app-event {
     &:not(:first-child) {
@@ -20,13 +43,13 @@
   }
 }
 
-.events-list-wrap{
+.events-list-wrap {
   display: flex;
   align-items: center;
   width: 100%;
 }
 
-.section-event-message{
+.section-event-message {
   justify-content: flex-start;
   font-size: 20px;
 }

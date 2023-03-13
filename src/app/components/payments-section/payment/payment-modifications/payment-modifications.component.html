@@ -1,11 +1,20 @@
 <div class="payment-modifications">
-  <div class="no-enough-users" *ngIf="usersToSelect.length === 1">
-    <div class="no-mods-text">Only one user attached, this is not enough to create modifications</div>
-  </div>
-  <div class="no-modifications" *ngIf="usersToSelect.length > 1 && isNoModifications">
-    <div class="no-mods-text">No modification found for this payment ticket</div>
-    <div class="no-mods-btn" (click)="openDialog()">Add one</div>
-  </div>
+
+  <div class="new-payment-warning no-mods-text" *ngIf="payment.isNew; else noUsers">You have to save payment to add modificaitons</div>
+
+  <ng-template #noUsers>
+    <div class="no-enough-users" *ngIf="usersToSelect.length === 1; else noModsFound">
+      <div class="no-mods-text">Only one user attached, this is not enough to create modifications</div>
+    </div>
+  </ng-template>
+
+  <ng-template #noModsFound>
+    <div class="no-modifications" *ngIf="usersToSelect.length > 1 && isNoModifications">
+      <div class="no-mods-text">No modification found for this payment ticket</div>
+      <div class="no-mods-btn" (click)="openDialog()">Add one</div>
+    </div>
+  </ng-template>
+
   <div class="modifications" *ngIf="!isNoModifications">
     <div class="excluded-modifications" *ngIf="excludedModifications.length!==0">
       <ng-template ngFor let-modification [ngForOf]="excludedModifications">
