@@ -56,7 +56,7 @@ export class PaymentsSectionComponent implements OnDestroy, OnInit {
     const payment = Payment.create('', '', 0, selectedEventUid);
     this.paymentService.addOrUpdateEntity(payment);
 
-    this.toastr.success(`Payment was successfully added. Do not forget to save it!`);
+    this.toastr.success(`Payment was successfully added. Do not forget to save it`);
   }
 
   public get hasSelectedEvent(): boolean {
