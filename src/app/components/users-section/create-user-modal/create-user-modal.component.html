@@ -1,0 +1,44 @@
+<div class="user-modal-wrap">
+  <div class="user-modal-title" mat-dialog-title>
+    <div class="user-modal-label" [ngClass]="{isActive: !isNewUserState, disabled: users.length===0}" (click)="setIsNewUserState(false)">
+      <span [title]="getExistedUsersTitle()">Add existed users</span>
+    </div>
+    <div class="user-modal-separator">/</div>
+    <div class="user-modal-label" [ngClass]="{isActive: isNewUserState}" (click)="setIsNewUserState(true)">
+      <span>Create new user</span>
+    </div>
+  </div>
+
+  <div mat-dialog-content *ngIf="!isNewUserState">
+    <form class="user-modal-form">
+      <mat-form-field class="users-selection" appearance="fill">
+        <mat-label>Users</mat-label>
+        <mat-select required [formControl]="userIdsInputControl" multiple>
+          <ng-template *ngIf="users.length!==0" ngFor let-user [ngForOf]="users">
+            <mat-option [value]="user.uid">{{ user.name }}</mat-option>
+          </ng-template>
+        </mat-select>
+      </mat-form-field>
+    </form>
+
+    <div class="user-modal-btns">
+      <button mat-raised-button color="warn" (click)="onNoClick()">Cancel</button>
+      <button mat-raised-button color="primary" (click)="addUsers()">Add</button>
+    </div>
+  </div>
+
+  <div mat-dialog-content *ngIf="isNewUserState">
+    <form class="user-modal-form">
+      <mat-form-field appearance="fill">
+        <mat-label>Name</mat-label>
+        <input matInput placeholder="User name" [formControl]="nameInputControl">
+      </mat-form-field>
+    </form>
+
+    <div class="user-modal-btns">
+      <button mat-raised-button color="warn" (click)="onNoClick()">Cancel</button>
+      <button mat-raised-button color="primary" (click)="createUser()">Create</button>
+    </div>
+  </div>
+
+</div>

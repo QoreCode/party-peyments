@@ -1,0 +1,55 @@
+<mat-card class="payment-card-wrap">
+  <mat-card-content>
+    <div class="payment-details">
+      <div class="details-list">
+        <div class="payment-detail-name">Payer</div>
+        <div class="payment-detail-value">
+          <mat-form-field class="users-selection" appearance="fill">
+            <mat-select [formControl]="userIdSelectControl" [placeholder]="'Choose user'">
+              <ng-template *ngIf="usersToSelect.length!==0" ngFor let-user [ngForOf]="usersToSelect">
+                <mat-option [value]="user.uid" [disabled]="hasSomeonePayForUser(user.uid)">
+                  <span>{{ user.name }}</span>
+                  <fa-icon [icon]="infoIcon" *ngIf="hasSomeonePayForUser(user.uid)" [title]="getPayerUserTitle(user.uid)"></fa-icon>
+                </mat-option>
+              </ng-template>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="payment-detail-name">Price</div>
+        <div class="payment-detail-value">
+          <mat-form-field appearance="fill">
+            <input matInput placeholder="Please enter event name" value="event-name" [formControl]="priceInputControl">
+          </mat-form-field>
+          <span>UAH</span>
+        </div>
+      </div>
+      <div class="general-details">
+        <div class="payment-name" [title]="payment.name">
+          <mat-form-field appearance="fill">
+            <input matInput placeholder="Please enter event name" value="event-name" [formControl]="nameInputControl">
+          </mat-form-field>
+        </div>
+        <div class="payment-date">{{ payment.dateLabel }}</div>
+        <div class="payment-icons">
+          <div class="payment-update" [ngClass]="{disable: isSaveDisable}" (click)="updatePayment()">
+            <span>save</span>
+            <fa-icon [icon]="saveIcon"></fa-icon>
+          </div>
+          <span class="payment-icons-separator">/</span>
+          <div class="delete-user"
+               mwlConfirmationPopover
+               [popoverTitle]="'Deleting payment'"
+               [popoverMessage]="'Are you really want to delete this payment?'"
+               placement="left"
+               (confirm)="deletePayment()">
+            <div class="payment-delete">
+              <span>delete</span>
+              <fa-icon [icon]="deleteIcon"></fa-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <app-payment-modifications [payment]="payment"></app-payment-modifications>
+  </mat-card-content>
+</mat-card>

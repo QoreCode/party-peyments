@@ -1,0 +1,19 @@
+<div class="login-form-wrap">
+  <div class="login-form">
+    <mat-form-field class="full-width-input">
+      <mat-label>Firebase Link</mat-label>
+      <input matInput
+             placeholder="Enter the link to firebase db"
+             name="firebase-link" type="text" [formControl]="firebaseInputControl">
+      <mat-error *ngIf="firebaseInputControl.hasError('empty')">
+        Firebase link is <strong>required</strong>
+      </mat-error>
+      <mat-error *ngIf="firebaseInputControl.hasError('firebase')">
+        {{ firebaseInputControl.getError('firebase') }}
+      </mat-error>
+    </mat-form-field>
+    <mat-checkbox class="example-margin" [(ngModel)]="rememberMe" [color]="'primary'">Remember me</mat-checkbox>
+
+    <button class="login-button" mat-raised-button color="primary" (click)="setFirebaseLink()">Register</button>
+  </div>
+</div>

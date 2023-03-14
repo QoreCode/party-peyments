@@ -1,0 +1,85 @@
+.add-new-payment-icon {
+  font-size: 46px;
+  cursor: pointer;
+  transform: rotate(0);
+  display: inline-block;
+  transition: all 0.3s cubic-bezier(.25, .8, .25, 1);
+  line-height: 1em;
+  width: 46px;
+  height: 46px;
+  color: #304FFE;
+  border-radius: 50%;
+  box-shadow: 0 3px 6px rgb(0 0 0 / 16%), 0 3px 6px rgb(0 0 0 / 23%);
+
+  &:hover {
+    box-shadow: 14px 0 28px rgb(0 0 0 / 25%), 10px 0 10px rgb(0 0 0 / 22%);
+    transform: rotate(90deg);
+  }
+}
+
+.payments-wrap {
+  text-align: center;
+}
+
+.payments-list-wrap {
+  margin-top: 20px;
+  max-height: 500px;
+  overflow: auto;
+  padding: 0 20px 20px 20px;
+
+  &::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+    background-color: #F5F5F5;
+    border-radius: 25px;
+  }
+
+  &::-webkit-scrollbar {
+    width: 6px;
+    background-color: #F5F5F5;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 25px;
+  }
+}
+
+.payment-item {
+  &:not(:first-child) {
+    margin-top: 20px;
+    display: block;
+  }
+}
+
+.section-event-message.with-button {
+  display: flex;
+  flex-direction: column;
+}
+
+.section-event-button {
+  margin-top: 10px;
+  cursor: pointer;
+  color: #304FFE;
+  position: relative;
+  padding: 0 10px 5px;
+
+  &:before {
+    content: '';
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 0;
+    height: 2px;
+    margin: auto;
+    background-color: #304FFE;
+    transition: all 0.2s;
+  }
+
+  &:hover {
+    &:before {
+      width: 100%;
+    }
+  }
+}

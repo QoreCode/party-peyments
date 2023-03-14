@@ -1,0 +1,28 @@
+<div class="section-event-message" *ngIf="!hasSelectedEvent; else secondBlock">
+  <div>Please select event or create new one</div>
+</div>
+
+<ng-template #secondBlock>
+  <div class="section-event-message" *ngIf="!hasAttachedUsers; else thirdBlock">
+    <div>Please attach users to the event</div>
+  </div>
+</ng-template>
+
+<ng-template #thirdBlock>
+  <div class="section-event-message with-button" *ngIf="!hasPayments; else contentBlock">
+    <div>You have no payments created for this event</div>
+    <div class="section-event-button" (click)="addPayment()">Create one</div>
+  </div>
+</ng-template>
+
+
+<ng-template #contentBlock>
+  <div *ngIf="hasSelectedEvent && hasAttachedUsers && hasPayments" style="width: 100%" class="payments-wrap">
+    <fa-icon [icon]="plusIcon" class="add-new-payment-icon" (click)="addPayment()"></fa-icon>
+    <div class="payments-list-wrap">
+      <ng-template ngFor let-payment [ngForOf]="payments">
+        <app-payment [payment]="payment" class="payment-item"></app-payment>
+      </ng-template>
+    </div>
+  </div>
+</ng-template>

@@ -1,0 +1,301 @@
+/* You can add global styles to this file, and also import other style files */
+
+html, body {
+  height: 100%;
+  background-color: #F8F8F8;
+  position: relative;
+  display: block;
+  overflow: auto;
+
+  > * {
+    position: relative;
+    display: block;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.toast-container .ngx-toastr {
+  width: auto;
+  max-width: 500px;
+  background-image: none;
+  padding: 15px;
+}
+
+.toast-error {
+  background-color: #D50000;
+}
+
+.toast-title {
+  font-weight: normal;
+  font-size: 20px;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid white;
+  line-height: 1em;
+}
+
+.toast-message {
+  word-wrap: break-word;
+  font-size: 14px;
+  font-weight: 150;
+}
+
+
+// --- input
+
+.mat-mdc-form-field {
+  .mdc-text-field--filled {
+    &:not(.mdc-text-field--disabled) {
+      background-color: transparent;
+    }
+  }
+
+  .mat-mdc-text-field-wrapper:not(.mdc-text-field--outlined) .mat-mdc-form-field-infix {
+    padding-bottom: 5px;
+  }
+
+  .mat-mdc-form-field-infix {
+    min-height: 40px;
+  }
+
+  .mat-mdc-text-field-wrapper {
+    padding: 0 5px;
+  }
+
+  .mat-mdc-form-field-focus-overlay {
+    background-color: transparent;
+  }
+
+  &:hover {
+    .mat-mdc-form-field-focus-overlay {
+      background-color: transparent;
+    }
+  }
+
+  .mat-mdc-form-field-error {
+    font-size: 11px;
+    line-height: 1.2em;
+
+    &:before {
+      display: none;
+    }
+  }
+
+  .mat-mdc-form-field-hint-wrapper, .mat-mdc-form-field-error-wrapper {
+    padding: 5px 5px 0 5px;
+  }
+}
+
+// popover
+
+.popover {
+  background-color: white;
+  padding: 20px;
+  box-shadow: 0 12px 26px #0000004d, 0 10px 8px #00000038;
+  width: 300px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  z-index: 2;
+
+  $arrowSize: 18px;
+  $arrowSizeN: -18px;
+
+  &.bs-popover-bottom {
+    .arrow {
+      top: calc($arrowSizeN);
+      left: calc(50% - 38px) !important;
+      margin: 0 $arrowSize;
+
+      &:before {
+        top: 0;
+        border-width: 0 $arrowSize $arrowSize $arrowSize;
+      }
+
+      &:after {
+        top: 1px;
+        border-width: 0 $arrowSize $arrowSize $arrowSize;
+      }
+    }
+  }
+
+  &.bs-popover-right {
+    left: 8px !important;
+
+    .arrow {
+      left: -28px;
+      top: calc(50% - $arrowSize) !important;
+      margin: calc($arrowSize / 2) 0;
+
+      &:before {
+        left: 0;
+        transform: rotateZ(-90deg);
+        border-width: 0 $arrowSize $arrowSize $arrowSize;
+      }
+
+      &:after {
+        left: 1px;
+        transform: rotateZ(-90deg);
+        border-width: 0 $arrowSize $arrowSize $arrowSize;
+      }
+    }
+  }
+
+  .arrow {
+    position: absolute;
+    display: block;
+    width: $arrowSize;
+    height: $arrowSize;
+
+    &:before {
+      position: absolute;
+      display: block;
+      content: "";
+      border-color: transparent;
+      border-bottom-color: rgba(0, 0, 0, .12);
+      border-style: solid;
+    }
+
+    &:after {
+      position: absolute;
+      display: block;
+      content: "";
+      border-color: transparent;
+      border-style: solid;
+      border-bottom-color: #fff;
+    }
+  }
+}
+
+.popover-title {
+  padding: 0 0 10px 0;
+  border-bottom: 1px solid rgba(#000, 0.3);
+  margin: 0 0 20px 0;
+  font-size: 24px;
+}
+
+.popover-content {
+  p {
+    margin: 0 0 5px 0;
+    font-size: 16px;
+  }
+
+  .confirm-btns {
+    margin-top: 20px;
+    justify-content: space-between;
+  }
+}
+
+.confirm-btn-container {
+  display: flex;
+  flex-basis: 0;
+
+  &:not(:first-child) {
+    margin-left: 8px !important;;
+  }
+
+  &:not(:last-child) {
+    margin-right: 8px !important;
+  }
+
+  button {
+    border-color: rgba(0, 0, 0, .12);
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-width: 140px;
+    outline: none;
+    line-height: inherit;
+    user-select: none;
+    -webkit-appearance: none;
+    overflow: visible;
+    vertical-align: middle;
+    border-style: solid;
+    border-radius: 4px;
+    padding: 0 15px 0 15px;
+    border-width: 1px;
+    height: 42px;
+    color: #000;
+    cursor: pointer;
+    display: block;
+    -webkit-transition: background-color 150ms;
+    -ms-transition: background-color 150ms;
+    -moz-transition: background-color 150ms;
+    -o-transition: background-color 150ms;
+    transition: all 150ms;
+    width: 100%;
+
+    &:hover {
+      -webkit-transition: background-color 150ms;
+      -ms-transition: background-color 150ms;
+      -moz-transition: background-color 150ms;
+      -o-transition: background-color 150ms;
+      transition: background-color 150ms;
+    }
+  }
+
+  // cancel
+  .btn-outline-secondary {
+    background-color: rgba(0, 0, 0, 0);
+
+    &:hover {
+      background-color: rgba(0, 0, 0, .05);
+    }
+  }
+
+  // confirm
+  .btn-danger {
+    display: flex;
+    background-color: #ffffff;
+    color: rgb(213, 12, 12);
+    border-color: rgb(213, 12, 12);
+
+    &:hover {
+      color: #ffffff;
+      background-color: rgb(213, 12, 12);
+    }
+  }
+}
+
+// Modal
+.mdc-dialog__title {
+  text-align: center;
+}
+
+// card
+mat-card.mat-mdc-card {
+  border-radius: 10px;
+  position: relative;
+}
+
+
+// other
+.section-event-message {
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  display: flex;
+  font-size: 24px;
+  color: #AAA;
+  text-shadow: -1px 1px 1px #FFF;
+  text-align: center;
+}
+
+.add-btn {
+  font-size: 24px;
+  cursor: pointer;
+  padding: 2px;
+  transform: rotate(0);
+  transition: all 0.2s;
+  color: #304FFE;
+
+  &:hover {
+    color: black;
+    transform: rotate(90deg);
+  }
+}
+
+

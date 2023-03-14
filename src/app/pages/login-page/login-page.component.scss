@@ -1,0 +1,32 @@
+.login-form-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 280px;
+}
+
+.login-form {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-direction: column;
+  width: 500px;
+}
+
+.mat-mdc-checkbox {
+  margin-left: -10px;
+}
+
+.full-width-input {
+  width: 100%;
+}
+
+.login-button {
+  margin-top: 20px;
+  align-self: center;
+}
+
+::ng-deep .mat-form-field-appearance-fill .mat-form-field-flex {
+  background-color: #fff;
+}
