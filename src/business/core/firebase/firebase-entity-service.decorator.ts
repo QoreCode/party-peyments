@@ -12,6 +12,9 @@ export default class FirebaseEntityServiceDecorator<TEntity extends Model> imple
   }
 
   public async addOrUpdateEntity(entity: TEntity): Promise<void> {
+    // @ts-ignore
+    if (isDB && entity.isNew !== undefined) entity.isNew = false;
+
     const dbInstance = Firebase.getInstance().db;
     await set(ref(dbInstance, `${ this.entityService.tableName }/${ entity.uid }`), entity.toJson());
 
