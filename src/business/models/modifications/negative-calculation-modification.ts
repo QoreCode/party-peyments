@@ -54,7 +54,7 @@ export default class NegativeCalculationModification extends Model {
    * @param membersMap Map<userId, payment> **/
   public applyModification(membersMap: Map<string, number>, paymentCheck: number): Map<string, number> {
     const defaultPaymentForEachMember = Math.round(paymentCheck / membersMap.size);
-    const paymentForUsers = paymentCheck + this._mathExpression;
+    const paymentForUsers = Number(paymentCheck) + Number(this._mathExpression);
     const defaultPaymentForEachUser = Math.round(paymentForUsers / membersMap.size);
     const currentPaymentModification = defaultPaymentForEachMember - defaultPaymentForEachUser;
     const currentPaymentModificationForEachUser = Math.round(currentPaymentModification / this._usersUid.length);

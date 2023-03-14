@@ -8,7 +8,7 @@
         <input matInput placeholder="Please enter event name" value="event-name" [formControl]="nameInputControl">
       </mat-form-field>
 
-      <mat-form-field class="users-selection" appearance="fill">
+      <mat-form-field class="users-selection" appearance="fill" *ngIf="users.length>0; else noUsersBlock">
         <mat-label>Users</mat-label>
         <mat-select [formControl]="userIdsInputControl" multiple>
           <ng-template *ngIf="users.length!==0" ngFor let-user [ngForOf]="users">
@@ -16,6 +16,9 @@
           </ng-template>
         </mat-select>
       </mat-form-field>
+      <ng-template #noUsersBlock>
+        <div class="no-users-text">You have no users to add<br> This option can be available later</div>
+      </ng-template>
     </form>
 
     <div class="event-modal-btns">

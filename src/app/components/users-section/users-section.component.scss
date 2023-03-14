@@ -6,11 +6,10 @@
 
 .members-wrap {
   width: 100%;
+  padding-right: 20px;
 }
 
 .members-list-wrap {
-  overflow: auto;
-  max-height: 605px;
   padding-right: 20px;
   padding-bottom: 5px;
 
@@ -33,7 +32,7 @@
 
 .members {
   display: flex;
-  width: 100%;
+  padding-right: 15px;
   justify-content: space-between;
   align-items: center;
 }

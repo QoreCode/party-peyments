@@ -1,7 +1,7 @@
 <div class="user-modal-wrap">
   <div class="user-modal-title" mat-dialog-title>
-    <div class="user-modal-label" [ngClass]="{isActive: !isNewUserState}" (click)="setIsNewUserState(false)">
-      <span>Add existed users</span>
+    <div class="user-modal-label" [ngClass]="{isActive: !isNewUserState, disabled: users.length===0}" (click)="setIsNewUserState(false)">
+      <span [title]="getExistedUsersTitle()">Add existed users</span>
     </div>
     <div class="user-modal-separator">/</div>
     <div class="user-modal-label" [ngClass]="{isActive: isNewUserState}" (click)="setIsNewUserState(true)">

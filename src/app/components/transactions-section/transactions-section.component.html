@@ -15,5 +15,12 @@
 </ng-template>
 
 <ng-template #contentBlock>
-  <div>all fine</div>
+  <div class="user-section-wrap">
+    <ng-template ngFor let-user [ngForOf]="involvedUsers">
+      <app-transaction-item class="transaction-item"
+                            [user]="user"
+                            [transactionsMap]="transactionsMap"
+                            [transactions]="transactions"></app-transaction-item>
+    </ng-template>
+  </div>
 </ng-template>

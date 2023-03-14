@@ -45,7 +45,9 @@ export default class Payment extends Model {
 
   public get dateLabel(): string {
     const date = new Date(this._date);
-    return `${ date.getDate() }.${ date.getMonth() + 1 }.${ date.getFullYear() } ${ date.getHours() }:${ date.getMinutes() }`;
+    const hours = date.getHours() < 9 ? `0${ date.getHours() }` : date.getHours();
+    const minutes = date.getMinutes() < 9 ? `0${ date.getMinutes() }` : date.getMinutes();
+    return `${ date.getDate() }.${ date.getMonth() + 1 }.${ date.getFullYear() } ${ hours }:${ minutes }`;
   }
 
   public get eventUid(): string {

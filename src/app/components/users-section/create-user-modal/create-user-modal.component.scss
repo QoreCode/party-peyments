@@ -41,7 +41,11 @@
     margin: auto;
   }
 
-  &.isActive {
+  &.disabled {
+    cursor: help;
+  }
+
+  &.isActive:not(.disabled) {
     color: black;
 
     &:after {
@@ -49,7 +53,7 @@
     }
   }
 
-  &:hover {
+  &:hover:not(.disabled) {
     &:after {
       width: 100%;
     }

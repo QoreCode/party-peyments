@@ -79,7 +79,6 @@ export default class TransactionService extends EntityService<Transaction> {
       this.generateTransactions(membersPaymentMap, payedUser, payment, eventUid);
     }
 
-
     const usersMap = new Map(users.map((user => [user.uid, user])));
     await this.replacePaymentMembers(usersMap);
 

@@ -1,5 +1,7 @@
 <div class="events-wrap">
-  <div class="section-event-message" *ngIf="eventsList.length === 0">You have no events, please add one</div>
+  <div class="section-event-message" *ngIf="eventsList.length === 0">
+    You have no events, please <span class="add-one-text" (click)="openDialog()">add one</span>
+  </div>
   <div class="events-list-wrap" *ngIf="eventsList.length !== 0">
     <div class="events-title">Events</div>
     <div class="events-list">

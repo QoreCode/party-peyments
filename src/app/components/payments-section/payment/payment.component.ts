@@ -7,12 +7,13 @@ import { ToastrService } from 'ngx-toastr';
 import { FormControl, Validators } from '@angular/forms';
 import EventService from '@business/services/event.service';
 import ApplicationStateService from '@business/services/application-state.service';
-import { faFloppyDisk, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faCircleInfo, faFloppyDisk, faTrash } from '@fortawesome/free-solid-svg-icons';
 import FirebaseEntityServiceDecorator from '@business/core/firebase/firebase-entity-service.decorator';
 import PaymentService from '@business/services/payment.service';
 import ExcludeModificationService from '@business/services/exclude-modification.service';
 import ExcludeModification from '@business/models/modifications/exclude-modification';
 import CalculationModificationService, { CalculationModification } from '@business/services/calculation-modification.service';
+import PartyEvent from '@business/models/party-event.model';
 
 @Component({
   selector: 'app-payment',
@@ -27,6 +28,9 @@ export class PaymentComponent implements OnDestroy, OnInit {
 
   public saveIcon = faFloppyDisk;
   public deleteIcon = faTrash;
+  public infoIcon = faCircleInfo;
+
+  public currentEvent?: PartyEvent;
 
   public userIdSelectControl = new FormControl<string>('', [Validators.required]);
   public priceInputControl = new FormControl<number>(0, [Validators.required, Validators.min(0)]);
@@ -73,6 +77,32 @@ export class PaymentComponent implements OnDestroy, OnInit {
         alert(e);
       }
     }
+  }
+
+  public hasSomeonePayForUser(userUid: string): boolean {
+    if (this.currentEvent === undefined) {
+      return false;
+    }
+
+    return this.currentEvent.findWhoPayedForUser(userUid) !== undefined;
+  }
+
+  public getPayerUserTitle(userUid: string): string {
+    if (this.currentEvent === undefined) {
+      return 'Some user already pay for this user';
+    }
+
+    const payerUid = this.currentEvent.findWhoPayedForUser(userUid);
+    if (payerUid === undefined) {
+      return 'Some user already pay for this user';
+    }
+
+    const payer = this.allUsers.find((user: User) => user.uid === payerUid);
+    if (payer === undefined) {
+      return 'Some user already pay for this user';
+    }
+
+    return `${ payer.name } already pay for this user`;
   }
 
   public async updatePayment() {
@@ -176,5 +206,18 @@ export class PaymentComponent implements OnDestroy, OnInit {
     });
 
     this.eventServiceSubscription = this.eventService.subscribe(() => this.setUsersToSelect());
+
+    const currentEventUid = this.applicationService.getSelectedEventUid();
+    if (currentEventUid === undefined) {
+      return;
+    }
+
+    const currentEvent = await this.eventService.getEntityByUid(currentEventUid);
+    if (currentEvent === undefined) {
+      this.toastr.error(`Selected event is undefined! Something went wrong!`);
+      return;
+    }
+
+    this.currentEvent = currentEvent;
   }
 }

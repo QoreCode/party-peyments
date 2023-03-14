@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import FirebaseEntityServiceDecorator from '@business/core/firebase/firebase-entity-service.decorator';
 import { ToastrService } from 'ngx-toastr';
@@ -8,18 +8,22 @@ import User from '@business/models/user.model';
 import EventService from '@business/services/event.service';
 import ApplicationStateService from '@business/services/application-state.service';
 import UserEventProperties from '@business/models/user-event-properties.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-create-user-modal',
   templateUrl: './create-user-modal.component.html',
   styleUrls: ['./create-user-modal.component.scss']
 })
-export class CreateUserModalComponent {
+export class CreateUserModalComponent implements OnDestroy, OnInit {
+  public isNewUserState: boolean = false;
+  public users: User[] = [];
+
+  public usersSubscription!: Subscription;
+
   public nameInputControl = new FormControl('', [
     Validators.required, Validators.minLength(3), Validators.maxLength(200)]);
   public userIdsInputControl = new FormControl<string[]>([], [Validators.required]);
-  public isNewUserState: boolean = false;
-  public users: User[] = [];
 
   constructor(public dialogRef: MatDialogRef<CreateUserModalComponent>,
               public applicationStateService: ApplicationStateService,
@@ -27,29 +31,22 @@ export class CreateUserModalComponent {
               public eventService: EventService,
               public userService: UserService
   ) {
-    this.userService.getEntities().then(async (users: User[]) => {
-      const selectedEventUid = this.applicationStateService.getSelectedEventUid();
-      if (selectedEventUid === undefined) {
-        this.toastr.error('Selected Event is undefined. Stop breaking my app!');
-        return;
-      }
-
-      const event = await this.eventService.getEntityByUid(selectedEventUid);
-      if (event === undefined) {
-        this.toastr.error('Event is undefined. Stop breaking my app!');
-        return;
-      }
-
-      const alreadyAttachedUsers = new Set(event.usersEventProperties.map((userEventProperties: UserEventProperties) => {
-        return userEventProperties.userUid;
-      }));
-
-      this.users = users.filter((user: User) => !alreadyAttachedUsers.has(user.uid));
-    });
   }
 
   public setIsNewUserState(isNewUserState: boolean): void {
+    if (isNewUserState === false && this.users.length === 0) {
+      return;
+    }
+
     this.isNewUserState = isNewUserState;
+  }
+
+  public getExistedUsersTitle(): string {
+    if (this.users.length === 0) {
+      return 'No users created or all of them already attached to the event';
+    }
+
+    return '';
   }
 
   public async createUser() {
@@ -126,5 +123,36 @@ export class CreateUserModalComponent {
 
     this.toastr.success('User was successfully created');
     this.dialogRef.close();
+  }
+
+  ngOnDestroy(): void {
+    this.usersSubscription.unsubscribe();
+  }
+
+  async ngOnInit(): Promise<void> {
+    this.userService.subscribe(async () => {
+      const selectedEventUid = this.applicationStateService.getSelectedEventUid();
+      if (selectedEventUid === undefined) {
+        this.toastr.error('Selected Event is undefined. Stop breaking my app!');
+        return;
+      }
+
+      const event = await this.eventService.getEntityByUid(selectedEventUid);
+      if (event === undefined) {
+        this.toastr.error('Event is undefined. Stop breaking my app!');
+        return;
+      }
+
+      const alreadyAttachedUsers = new Set(event.usersEventProperties.map((userEventProperties: UserEventProperties) => {
+        return userEventProperties.userUid;
+      }));
+
+      const users = await this.userService.getEntities();
+      this.users = users.filter((user: User) => !alreadyAttachedUsers.has(user.uid));
+
+      if (this.users.length === 0) {
+        this.isNewUserState = true;
+      }
+    })
   }
 }

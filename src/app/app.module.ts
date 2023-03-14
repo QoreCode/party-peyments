@@ -29,6 +29,8 @@ import { CreateUserModalComponent } from './components/users-section/create-user
 import { PaymentComponent } from './components/payments-section/payment/payment.component';
 import { CreatePaymentModModalComponent } from './components/payments-section/create-payment-mod-modal/create-payment-mod-modal.component';
 import { PaymentModificationsComponent } from './components/payments-section/payment/payment-modifications/payment-modifications.component';
+import { TransactionItemComponent } from './components/transactions-section/transaction-item/transaction-item.component';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 @NgModule({
   declarations: [
@@ -45,26 +47,28 @@ import { PaymentModificationsComponent } from './components/payments-section/pay
     CreateUserModalComponent,
     PaymentComponent,
     CreatePaymentModModalComponent,
-    PaymentModificationsComponent
+    PaymentModificationsComponent,
+    TransactionItemComponent
   ],
-  imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    ToastrModule.forRoot(),
-    MatInputModule,
-    MatButtonModule,
-    MatDialogModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatCheckboxModule,
-    FontAwesomeModule,
-    ConfirmationPopoverModule.forRoot({
-      confirmButtonType: 'danger', // set defaults here
-    }),
-    MatOptionModule,
-    MatSelectModule,
-    MatCardModule,
-  ],
+    imports: [
+        BrowserModule,
+        BrowserAnimationsModule,
+        ToastrModule.forRoot(),
+        MatInputModule,
+        MatButtonModule,
+        MatDialogModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatCheckboxModule,
+        FontAwesomeModule,
+        ConfirmationPopoverModule.forRoot({
+            confirmButtonType: 'danger', // set defaults here
+        }),
+        MatOptionModule,
+        MatSelectModule,
+        MatCardModule,
+        MatExpansionModule,
+    ],
   providers: [],
   bootstrap: [AppComponent]
 })
