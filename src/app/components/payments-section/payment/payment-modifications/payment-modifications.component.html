@@ -19,7 +19,7 @@
     <div class="excluded-modifications" *ngIf="excludedModifications.length!==0">
       <ng-template ngFor let-modification [ngForOf]="excludedModifications">
         <div class="modification excluded-modification">
-          <div class="modification-label">{{ involvedUserName(modification) }}</div>
+          <div class="modification-label">User {{ involvedUserName(modification) }} was removed from this payment</div>
           <fa-icon class="modification-remove" [icon]="deleteIcon" (click)="removeExcludedModification(modification.uid)"></fa-icon>
         </div>
       </ng-template>
