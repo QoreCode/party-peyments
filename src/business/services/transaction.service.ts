@@ -92,7 +92,7 @@ export default class TransactionService extends EntityService<Transaction> {
       }
 
       const transaction = Transaction.create(memberPayment, payment, toUser, fromUser, eventUid);
-      this.addOrUpdateEntity(transaction, false);
+      this.addOrUpdateEntity(transaction);
     }
   }
 

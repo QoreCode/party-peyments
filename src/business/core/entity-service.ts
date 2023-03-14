@@ -18,7 +18,7 @@ export default abstract class EntityService<TEntity extends Model> implements IE
   }
 
   // TODO: isDB - костыль, придумать механику isDB для сучностей
-  public addOrUpdateEntity(entity: TEntity, isDB: boolean = false): void {
+  public addOrUpdateEntity(entity: TEntity): void {
     const existedValues = this.entities.getValue();
     existedValues.set(entity.uid, entity);
 
