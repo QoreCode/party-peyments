@@ -159,6 +159,18 @@
   }
 }
 
+::ng-deep {
+  .popover {
+    width: 380px;
+  }
+
+  .popover-content p {
+    max-height: 300px;
+    overflow: auto;
+    line-height: 1.3em;
+  }
+}
+
 @keyframes bouncing {
   0% {
     top: -1px;
