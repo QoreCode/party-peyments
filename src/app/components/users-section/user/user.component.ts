@@ -12,6 +12,11 @@ import { Subscription } from 'rxjs';
 import UserService from '@business/services/user.service';
 import PartyEvent from '@business/models/party-event.model';
 import UserEventProperties from '@business/models/user-event-properties.model';
+import PaymentService from '@business/services/payment.service';
+import Payment from '@business/models/payment.model';
+import CalculationModificationService, { CalculationModification } from '@business/services/calculation-modification.service';
+import ExcludeModificationService from '@business/services/exclude-modification.service';
+import ExcludeModification from '@business/models/modifications/exclude-modification';
 
 @Component({
   selector: 'app-user',
@@ -27,15 +32,24 @@ export class UserComponent implements OnDestroy, OnInit {
   public currentEvent!: PartyEvent;
   public infoIcon = faInfoCircle;
   public disabledUsers: Set<string> = new Set();
+  public deleteUserMessage: string = '';
+  public deleteUserTimerId: number | null = null;
 
   public usersSubscription!: Subscription;
   public applicationSubscription!: Subscription;
   public eventsSubscription!: Subscription;
+  public paymentSubscription!: Subscription;
+  public excludeSubscription!: Subscription;
+  public calculationSubscription!: Subscription;
+
   public userIdsInputControl = new FormControl<string[]>([]);
 
   constructor(public eventService: EventService,
               public toastr: ToastrService,
               public userService: UserService,
+              public paymentService: PaymentService,
+              public calculationService: CalculationModificationService,
+              public excludeService: ExcludeModificationService,
               public applicationStateService: ApplicationStateService,
   ) {
   }
@@ -77,15 +91,21 @@ export class UserComponent implements OnDestroy, OnInit {
       this.setDisabledUsers();
     });
 
-    this.applicationSubscription = this.applicationStateService.subscribe(() => {
-      this.setCurrentEvent();
+    this.applicationSubscription = this.applicationStateService.subscribe(async () => {
+      await this.setCurrentEvent();
+      await this.generateDeleteUserTitle();
     });
 
     this.eventsSubscription = this.eventService.subscribe(async () => {
       await this.setCurrentEvent();
       await this.setDisabledUsers();
       this.userIdsInputControl.setValue(eventProperties.payedForUserUids);
-    })
+      await this.generateDeleteUserTitle();
+    });
+
+    this.paymentSubscription = this.paymentService.subscribe(() => this.generateDeleteUserTitle());
+    this.excludeSubscription = this.excludeService.subscribe(() => this.generateDeleteUserTitle());
+    this.calculationSubscription = this.calculationService.subscribe(() => this.generateDeleteUserTitle());
   }
 
   public async addRelatedUser() {
@@ -112,6 +132,39 @@ export class UserComponent implements OnDestroy, OnInit {
     return this.allUsers.filter((user: User) => user.uid !== this.user?.uid && involvedUsersSet.has(user.uid));
   }
 
+  public async generateDeleteUserTitle(): Promise<void> {
+    if (this.deleteUserTimerId !== null) {
+      clearTimeout(this.deleteUserTimerId);
+    }
+
+    setTimeout(async () => {
+      const [payments, calculationModifications] = await this.getRelatedEntities();
+      let message = 'The user wont be removed, but will be excluded from this event and can be added later.';
+
+      if (payments.length !== 0) {
+        const paymentNames = payments.map((payment: Payment) => `<br>- <strong>${ payment.name }</strong>`).join('');
+        message += '<br><br> The following payments will be removed:' + paymentNames;
+      }
+
+      if (calculationModifications.length !== 0) {
+        const allPayments: Payment[] = await this.paymentService.getEntities();
+        const paymentsMap = new Map(allPayments.map((payment: Payment) => [payment.uid, payment]));
+        const modMessages = calculationModifications.map((calcMod: CalculationModification) => {
+          const payment = paymentsMap.get(calcMod.paymentUid);
+          if (payment === undefined) {
+            return '';
+          }
+
+          return `- <strong>${ calcMod.mathExpression } UAH</strong> for payment: <strong>${ payment.name }</strong>`;
+        }).join('<br>');
+
+        message += '<br><br>' + `This modifications will be removed or updated: <br>${ modMessages }`;
+      }
+
+      this.deleteUserMessage = message;
+    }, 500);
+  }
+
   public async deleteUser(): Promise<void> {
     try {
       if (this.user === undefined) {
@@ -122,6 +175,26 @@ export class UserComponent implements OnDestroy, OnInit {
 
       const eventFBDec = new FirebaseEntityServiceDecorator(this.eventService);
       await eventFBDec.addOrUpdateEntity(this.currentEvent);
+
+      const [payments, calculationModifications, excludeModifications] = await this.getRelatedEntities();
+
+      const paymentFBDec = new FirebaseEntityServiceDecorator(this.paymentService);
+      await Promise.all(payments.map((payment: Payment) => paymentFBDec.deleteEntity(payment.uid)));
+
+      const calcFBDec = new FirebaseEntityServiceDecorator(this.calculationService);
+      await Promise.all(calculationModifications.map((calculationModification: CalculationModification) => {
+        if (calculationModification.usersUid.length > 1) {
+          calculationModification.removeUser(this.user.uid);
+          return calcFBDec.addOrUpdateEntity(calculationModification);
+        }
+
+        return calcFBDec.deleteEntity(calculationModification.uid);
+      }));
+
+      const excludeFBDec = new FirebaseEntityServiceDecorator(this.calculationService);
+      await Promise.all(excludeModifications.map((excludeModification: ExcludeModification) => {
+        return excludeFBDec.deleteEntity(excludeModification.uid)
+      }));
     } catch (e) {
       if (e instanceof Error) {
         this.toastr.error(e.message);
@@ -129,6 +202,21 @@ export class UserComponent implements OnDestroy, OnInit {
         console.error(e);
       }
     }
+  }
+
+  public async getRelatedEntities(): Promise<[Payment[], CalculationModification[], ExcludeModification[]]> {
+    const payments: Payment[] = await this.paymentService.getPaymentsByUserUid(this.user.uid, this.currentEvent.uid);
+    const allPayments: Payment[] = await this.paymentService.getEntities();
+
+    const calculationModifications: CalculationModification[] = (await Promise.all(allPayments.map((payment: Payment) => {
+      return this.calculationService.getEntitiesByPaymentAndUserId(payment.uid, this.user.uid);
+    }))).flat();
+
+    const excludeModifications: ExcludeModification[] = (await Promise.all(allPayments.map((payment: Payment) => {
+      return this.excludeService.getEntitiesByPaymentAndUserId(payment.uid, this.user.uid);
+    }))).flat();
+
+    return [payments, calculationModifications, excludeModifications];
   }
 
   public toggleRelatedUsers() {
@@ -235,6 +323,9 @@ export class UserComponent implements OnDestroy, OnInit {
     this.usersSubscription.unsubscribe();
     this.eventsSubscription.unsubscribe();
     this.applicationSubscription.unsubscribe();
+    this.paymentSubscription.unsubscribe();
+    this.calculationSubscription.unsubscribe();
+    this.excludeSubscription.unsubscribe();
   }
 
   private async setCurrentEvent() {

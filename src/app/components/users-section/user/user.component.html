@@ -5,7 +5,7 @@
       <div class="delete-user"
            mwlConfirmationPopover
            [popoverTitle]="'You are about to exclude this user'"
-           [popoverMessage]="'The user wont be removed, but will be excluded from this event and can be added later'"
+           [popoverMessage]="deleteUserMessage"
            placement="right"
            (confirm)="deleteUser()">
         <fa-icon [icon]="closeIcon"></fa-icon>

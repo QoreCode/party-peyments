@@ -51,6 +51,10 @@ export default class TransactionService extends EntityService<Transaction> {
     this.clear();
 
     for (const payment of payments) {
+      if (payment.isNew) {
+        continue;
+      }
+
       const payedUser = await this._userService.getEntityByUid(payment.userUid);
       if (payedUser === undefined) throw new Error(`Can't find user with id ${ payment.userUid }`);
 

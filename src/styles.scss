@@ -16,6 +16,7 @@ html, body {
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
+  min-width: 1800px;
 }
 
 .toast-container .ngx-toastr {

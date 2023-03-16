@@ -12,6 +12,10 @@ export default class PaymentService extends EntityService<Payment> {
     return (await this.getEntities()).filter((payment: Payment) => payment.eventUid === eventUid);
   }
 
+  public async getPaymentsByUserUid(userUid: string, eventUid: string): Promise<Payment[]> {
+    return (await this.getEntities()).filter((payment: Payment) => payment.userUid === userUid && payment.eventUid === eventUid);
+  }
+
   public createFromJson(data: Record<string, any>): Payment {
     const uid = this.extractValue(data, 'uid');
     const name = this.extractValue(data, 'name');
