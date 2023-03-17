@@ -3,8 +3,9 @@
     <div class="payment-modal-label" [ngClass]="{isActive: isCalculation}" (click)="setIsCalculation(true)">
       <span>Calculation</span>
     </div>
-    <div class="payment-modal-separator">/</div>
-    <div class="payment-modal-label" [ngClass]="{isActive: !isCalculation}" (click)="setIsCalculation(false)">
+    <div class="payment-modal-separator" *ngIf="data.modification===undefined">/</div>
+    <div class="payment-modal-label" *ngIf="data.modification===undefined" [ngClass]="{isActive: !isCalculation}"
+         (click)="setIsCalculation(false)">
       <span>Exclusion</span>
     </div>
   </div>
