@@ -105,8 +105,12 @@
       font-size: 20px;
     }
 
-    .info-icon {
+    .info-icon, .info-disabled-icon {
       cursor: help;
+    }
+
+    .info-icon{
+      color: #448AFF;
     }
   }
 

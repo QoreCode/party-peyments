@@ -34,6 +34,7 @@ export class UserComponent implements OnDestroy, OnInit {
   public disabledUsers: Set<string> = new Set();
   public deleteUserMessage: string = '';
   public deleteUserTimerId: number | null = null;
+  public allPayments: Payment[] = [];
 
   public usersSubscription!: Subscription;
   public applicationSubscription!: Subscription;
@@ -94,6 +95,7 @@ export class UserComponent implements OnDestroy, OnInit {
     this.applicationSubscription = this.applicationStateService.subscribe(async () => {
       await this.setCurrentEvent();
       await this.generateDeleteUserTitle();
+      this.allPayments = await this.paymentService.getPaymentsByEventUid(this.currentEvent.uid);
     });
 
     this.eventsSubscription = this.eventService.subscribe(async () => {
@@ -103,7 +105,10 @@ export class UserComponent implements OnDestroy, OnInit {
       await this.generateDeleteUserTitle();
     });
 
-    this.paymentSubscription = this.paymentService.subscribe(() => this.generateDeleteUserTitle());
+    this.paymentSubscription = this.paymentService.subscribe(async () => {
+      this.allPayments = await this.paymentService.getPaymentsByEventUid(this.currentEvent.uid);
+      this.generateDeleteUserTitle();
+    });
     this.excludeSubscription = this.excludeService.subscribe(() => this.generateDeleteUserTitle());
     this.calculationSubscription = this.calculationService.subscribe(() => this.generateDeleteUserTitle());
   }
@@ -115,11 +120,24 @@ export class UserComponent implements OnDestroy, OnInit {
       return;
     }
 
-    const value = this.userIdsInputControl.getRawValue();
-    eventProperties.setUserUidForPayed(value ?? []);
+    const selectedUsersUids = this.userIdsInputControl.getRawValue();
+    eventProperties.setUserUidForPayed(selectedUsersUids ?? []);
 
     const eventServiceFBDec = new FirebaseEntityServiceDecorator(this.eventService);
     await eventServiceFBDec.addOrUpdateEntity(this.currentEvent);
+
+    const selectedUsersUidSet = new Set(selectedUsersUids);
+    const relatedPayments = this.allPayments.filter((payment: Payment) => selectedUsersUidSet.has(payment.userUid));
+    if (relatedPayments.length !== 0) {
+      const paymentServiceFBDec = new FirebaseEntityServiceDecorator(this.paymentService);
+
+      await Promise.all(relatedPayments.map((payment: Payment) => {
+        payment.userUid = this.user.uid;
+        return paymentServiceFBDec.addOrUpdateEntity(payment)
+      }));
+    }
+
+    this.toastr.success(`Payed user was successfully added`);
   }
 
   public get usersToSelect(): User[] {
@@ -137,7 +155,7 @@ export class UserComponent implements OnDestroy, OnInit {
       clearTimeout(this.deleteUserTimerId);
     }
 
-    setTimeout(async () => {
+    this.deleteUserTimerId = setTimeout(async () => {
       const [payments, calculationModifications] = await this.getRelatedEntities();
       let message = 'The user wont be removed, but will be excluded from this event and can be added later.';
 
@@ -223,12 +241,15 @@ export class UserComponent implements OnDestroy, OnInit {
     this.isOpened = !this.isOpened;
   }
 
-  public setDisabledUsers(): void {
+  public async setDisabledUsers(): Promise<void> {
     this.disabledUsers.clear();
 
     if (this.usersToSelect.length === 0) {
       return;
     }
+
+    const payments = await this.paymentService.getPaymentsByEventUid(this.currentEvent.uid);
+    const payedUsers = new Set(payments.map((payment: Payment) => payment.userUid));
 
     this.usersToSelect.forEach((userToSelect: User) => {
       this.currentEvent.usersEventProperties.forEach((eventProperties: UserEventProperties) => {
@@ -237,25 +258,34 @@ export class UserComponent implements OnDestroy, OnInit {
           return;
         }
 
-        // disable users who are payed by someone already
+        // disable users who are pay by someone already
         if (eventProperties.hasPayedUserUid(userToSelect.uid)) {
-          this.disabledUsers.add(userToSelect.uid)
+          this.disabledUsers.add(userToSelect.uid);
         }
 
         // disable users who are pay for someone already
         if (eventProperties.userUid === userToSelect.uid && eventProperties.payedForUserUids.length > 0) {
-          this.disabledUsers.add(userToSelect.uid)
+          this.disabledUsers.add(userToSelect.uid);
         }
 
         // disable user (only one possible) who pay for current user
         if (eventProperties.userUid === userToSelect.uid && eventProperties.hasPayedUserUid(this.user.uid)) {
-          this.disabledUsers.add(userToSelect.uid)
+          this.disabledUsers.add(userToSelect.uid);
         }
       });
     });
   }
 
-  public getOptionHelpTitle(userOptionUid: string): string {
+  public getOptionHelpTitle(optionUser: User): string {
+    const relatedPayments = this.allPayments.filter((payment: Payment) => payment.userUid === optionUser.uid);
+    if (relatedPayments.length !== 0) {
+      return `User ${ this.user.name } will pay for payments: ${ relatedPayments.map((payment: Payment) => payment.name).join(', ') }`
+    }
+
+    return '';
+  }
+
+  public getOptionDisableHelpTitle(userOptionUid: string): string {
     const allUsersEventProperties = this.currentEvent.usersEventProperties;
 
     for (const eventProperties of allUsersEventProperties) {
@@ -283,6 +313,11 @@ export class UserComponent implements OnDestroy, OnInit {
           return 'Someone already payed for this user';
         }
       }
+    }
+
+    const relatedPayments = this.allPayments.filter((payment: Payment) => payment.userUid === userOptionUid);
+    if (relatedPayments.length !== 0) {
+      return `User already pay for: ${ relatedPayments.map((payment: Payment) => payment.name).join(', ') }`
     }
 
     return `Something went wrong. This user disabled by mistake`
