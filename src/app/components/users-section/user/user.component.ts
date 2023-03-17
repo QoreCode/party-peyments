@@ -159,6 +159,26 @@ export class UserComponent implements OnDestroy, OnInit {
       const [payments, calculationModifications] = await this.getRelatedEntities();
       let message = 'The user wont be removed, but will be excluded from this event and can be added later.';
 
+      const allUsersMap = new Map(this.allUsers.map((user: User) => [user.uid, user]));
+
+      const whoThisUserPayedFor = this.currentEvent.findWhoPayedForUser(this.user.uid);
+      if (whoThisUserPayedFor !== undefined) {
+        const username = allUsersMap.get(whoThisUserPayedFor)?.name ?? '';
+        message += '<br><br>' + `User <strong>${ username }</strong> won't be payer for user <strong>${ this.user.name }</strong> anymore`;
+      }
+
+      const eventProperties = this.currentEvent.getUserEventPropertiesByUserUid(this.user.uid);
+      if (eventProperties !== undefined && eventProperties.payedForUserUids.length > 0) {
+        const payedForMessages: string = eventProperties.payedForUserUids.map((payedForUserUid: string) => {
+          const payedForUser = allUsersMap.get(payedForUserUid);
+          if (payedForUser === undefined) return '';
+
+          return `<br>- <strong>${ payedForUser.name }</strong>`;
+        }).join(', ');
+        const username = allUsersMap.get(this.user.uid)?.name ?? '';
+        message += '<br><br>' + `User <strong>${ username }</strong> won't be payer for users: ${ payedForMessages }`;
+      }
+
       if (payments.length !== 0) {
         const paymentNames = payments.map((payment: Payment) => `<br>- <strong>${ payment.name }</strong>`).join('');
         message += '<br><br> The following payments will be removed:' + paymentNames;

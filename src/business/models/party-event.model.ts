@@ -64,6 +64,7 @@ export default class PartyEvent extends Model {
     return this._usersEventProperties.some((usersEventProperties: UserEventProperties) => usersEventProperties.userUid === userUid);
   }
 
+  // user can have only one payer
   public findWhoPayedForUser(userUid: string): string | undefined {
     for (const usersEventProperties of this._usersEventProperties) {
       if (usersEventProperties.hasPayedUserUid(userUid)) {
