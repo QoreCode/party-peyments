@@ -39,6 +39,10 @@
   font-size: 20px;
   z-index: 2;
   position: relative;
+  width: 100px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .user-transaction-head {
@@ -63,7 +67,7 @@
       position: absolute;
       height: 0;
       border: 1px dashed #bbb;
-      bottom: 2px;
+      bottom: 1px;
       left: 5px;
       right: 5px;
     }
@@ -75,6 +79,8 @@
   font-weight: bold;
   z-index: 2;
   position: relative;
+  width: 100px;
+  text-align: right;
 }
 
 .user-transaction-body-content {
