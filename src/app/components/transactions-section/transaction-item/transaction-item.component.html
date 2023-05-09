@@ -5,23 +5,34 @@
       <ng-template ngFor let-userTransaction [ngForOf]="getUserTransactions()">
         <mat-card class="user-transaction">
           <mat-card-content class="card-content">
-            <div class="user-transaction-head" (click)="toggleIsHiddenDetails(userTransaction)">
+            <div class="user-transaction-head">
               <div class="user-transaction-label">{{ userTransaction.user.name }}</div>
+              <div class="user-transaction-card"
+                   title="copy card number"
+                   (click)="copyCardNumber(userTransaction.user.card)"
+                   *ngIf="userTransaction.user.normalizedCard">{{ userTransaction.user.normalizedCard }}</div>
               <div class="user-transaction-total">{{ getTotal(userTransaction) }} UAH</div>
             </div>
-            <div class="user-transaction-body" [ngClass]="{hidden: isHiddenItemDetails(userTransaction)}">
-              <ng-template ngFor let-transactionItem [ngForOf]="userTransaction.transactions">
-                <div class="transaction-item">
-                  <div class="transaction-item-label" [title]="getTransactionLabel(transactionItem)">
-                    {{ transactionItem.getText() }}
+            <div class="user-transaction-body">
+              <div class="user-transaction-body-content" [ngClass]="{hidden: isHiddenItemDetails(userTransaction)}">
+                <ng-template ngFor let-transactionItem [ngForOf]="userTransaction.transactions">
+                  <div class="transaction-item">
+                    <div class="transaction-item-label" [title]="getTransactionLabel(transactionItem)">
+                      {{ transactionItem.getText() }}
+                    </div>
+                    <div class="transaction-item-value">{{ transactionItem.money }} UAH</div>
                   </div>
-                  <div class="transaction-item-value">{{ transactionItem.money }} UAH</div>
+                </ng-template>
+                <div class="transaction-item opposite-money" *ngIf="getOppositeMoney(userTransaction)!==0">
+                  <div class="transaction-item-label"
+                       [title]="getOppositeMoneyTitle(userTransaction)">{{ getOppositeMoneyTitle(userTransaction) }}</div>
+                  <div class="transaction-item-value">{{ getOppositeMoney(userTransaction)}} UAH</div>
                 </div>
-              </ng-template>
-              <div class="transaction-item opposite-money" *ngIf="getOppositeMoney(userTransaction)!==0">
-                <div class="transaction-item-label"
-                     [title]="getOppositeMoneyTitle(userTransaction)">{{ getOppositeMoneyTitle(userTransaction) }}</div>
-                <div class="transaction-item-value">{{ getOppositeMoney(userTransaction)}} UAH</div>
+              </div>
+              <div class="transaction-toggle-btn-wrap" [ngClass]="{hidden: isHiddenItemDetails(userTransaction)}">
+                <div class="transaction-toggle-btn" (click)="toggleIsHiddenDetails(userTransaction)">
+                  <fa-icon class="transaction-toggle-btn__icon" [icon]="arrowIcon"></fa-icon>
+                </div>
               </div>
             </div>
           </mat-card-content>

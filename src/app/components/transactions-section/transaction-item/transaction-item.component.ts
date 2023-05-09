@@ -1,6 +1,8 @@
 import { Component, Input } from '@angular/core';
 import User from '@business/models/user.model';
 import Transaction from '@business/models/transaction.model';
+import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { ToastrService } from 'ngx-toastr';
 
 export interface IUserTransactionItem {
   user: User,
@@ -15,9 +17,13 @@ export interface IUserTransactionItem {
 export class TransactionItemComponent {
   @Input() user!: User;
   @Input() transactions!: Transaction[];
-  @Input() transactionsMap!: Map<User, Map<User, number>>
+  @Input() transactionsMap!: Map<User, Map<User, number>>;
+  public arrowIcon = faChevronDown;
 
   public isHiddenDetails: Map<string, boolean> = new Map();
+
+  constructor(public toastr: ToastrService) {
+  }
 
   public toggleIsHiddenDetails(transactionItem: IUserTransactionItem): void {
     const isHidden = this.isHiddenDetails.get(transactionItem.user.uid) ?? true;
@@ -77,5 +83,17 @@ export class TransactionItemComponent {
     }
 
     return result;
+  }
+
+  public copyCardNumber(card: string | undefined): void {
+    if (card === undefined) {
+      return;
+    }
+
+    navigator.clipboard.writeText(card).then(() => {
+      this.toastr.success(`Copying to clipboard was successful!`);
+    }, (err) => {
+      this.toastr.error(`Could not copy text: ${ err }`);
+    });
   }
 }
