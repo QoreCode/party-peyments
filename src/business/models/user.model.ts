@@ -32,10 +32,12 @@ export default class User extends Model {
   }
 
   public toJson(): Record<string, any> {
-    return {
-      uid: this.uid,
-      name: this._name,
-      card: this._card
+    const result = { uid: this.uid, name: this._name };
+
+    if (this._card === undefined) {
+      return result;
     }
+
+    return { ...result, card: this.card }
   }
 }
