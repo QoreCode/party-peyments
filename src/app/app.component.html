@@ -1,7 +1,7 @@
 <div class="page-wrap">
   <h1 class="party-payments-header" (click)="copyLink()">Party Payments</h1>
 
-  <div *ngIf="isDBInitialized; else elseBlock">
+  <div class="page-content-wrap" *ngIf="isDBInitialized; else elseBlock">
     <app-main-page></app-main-page>
   </div>
 
