@@ -11,7 +11,8 @@ export default class UserService extends EntityService<User> {
   public createFromJson(data: Record<string, any>): User {
     const uid = this.extractValue(data, 'uid');
     const name = this.extractValue(data, 'name');
+    const card = data.card ? `${ data.card }` : undefined;
 
-    return new User(uid, name);
+    return new User(uid, name, card);
   }
 }

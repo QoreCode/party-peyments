@@ -3,8 +3,9 @@
     <div class="payment-modal-label" [ngClass]="{isActive: isCalculation}" (click)="setIsCalculation(true)">
       <span>Calculation</span>
     </div>
-    <div class="payment-modal-separator">/</div>
-    <div class="payment-modal-label" [ngClass]="{isActive: !isCalculation}" (click)="setIsCalculation(false)">
+    <div class="payment-modal-separator" *ngIf="data.modification===undefined">/</div>
+    <div class="payment-modal-label" *ngIf="data.modification===undefined" [ngClass]="{isActive: !isCalculation}"
+         (click)="setIsCalculation(false)">
       <span>Exclusion</span>
     </div>
   </div>
@@ -35,7 +36,7 @@
             <div class="positive-explanation">
               <div class="explanation-title">Negative amount</div>
               <div class="explanation-content">
-                <img [src]="'party-peyments/assets/negative-amaunt-example.PNG'" alt="Negative amount example">
+                <img [src]="'assets/negative-amaunt-example.PNG'" alt="Negative amount example">
 
                 <div class="explanation-text">
                   If all group bought something, but not all members want to pay for some parts of this <strong>payment</strong>
@@ -58,7 +59,7 @@
                   <strong>positive calculation modification</strong> for Bodya with additional <u>100 UAH</u>.
                 </div>
 
-                <img [src]="'party-peyments/assets/positive-amaunt-example.PNG'" alt="Positive amount example">
+                <img [src]="'assets/positive-amaunt-example.PNG'" alt="Positive amount example">
               </div>
             </div>
           </div>

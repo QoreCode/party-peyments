@@ -51,6 +51,10 @@ export default class TransactionService extends EntityService<Transaction> {
     this.clear();
 
     for (const payment of payments) {
+      if (payment.isNew) {
+        continue;
+      }
+
       const payedUser = await this._userService.getEntityByUid(payment.userUid);
       if (payedUser === undefined) throw new Error(`Can't find user with id ${ payment.userUid }`);
 
@@ -92,7 +96,7 @@ export default class TransactionService extends EntityService<Transaction> {
       }
 
       const transaction = Transaction.create(memberPayment, payment, toUser, fromUser, eventUid);
-      this.addOrUpdateEntity(transaction, false);
+      this.addOrUpdateEntity(transaction);
     }
   }
 

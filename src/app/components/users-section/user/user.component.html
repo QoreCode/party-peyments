@@ -5,7 +5,7 @@
       <div class="delete-user"
            mwlConfirmationPopover
            [popoverTitle]="'You are about to exclude this user'"
-           [popoverMessage]="'The user wont be removed, but will be excluded from this event and can be added later'"
+           [popoverMessage]="deleteUserMessage"
            placement="right"
            (confirm)="deleteUser()">
         <fa-icon [icon]="closeIcon"></fa-icon>
@@ -29,7 +29,10 @@
           <ng-template *ngIf="usersToSelect.length!==0" ngFor let-user [ngForOf]="usersToSelect">
             <mat-option [value]="user.uid" [disabled]="isDisabledOption(user.uid)">
               <span>{{ user.name }}</span>
-              <fa-icon *ngIf="isDisabledOption(user.uid)" [icon]="infoIcon" [title]="getOptionHelpTitle(user.uid)"
+              <fa-icon *ngIf="isDisabledOption(user.uid)" [icon]="infoIcon" [title]="getOptionDisableHelpTitle(user.uid)"
+                       class="info-disabled-icon"></fa-icon>
+              <fa-icon *ngIf="!isDisabledOption(user.uid) && getOptionHelpTitle(user).length !== 0"
+                       [icon]="infoIcon" [title]="getOptionHelpTitle(user)"
                        class="info-icon"></fa-icon>
             </mat-option>
           </ng-template>
