@@ -31,6 +31,9 @@ import { CreatePaymentModModalComponent } from './components/payments-section/cr
 import { PaymentModificationsComponent } from './components/payments-section/payment/payment-modifications/payment-modifications.component';
 import { TransactionItemComponent } from './components/transactions-section/transaction-item/transaction-item.component';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { PopoverModule } from '@coreui/angular';
+import { IconModule } from '@coreui/icons-angular';
+import { SatPopoverModule } from '@ncstate/sat-popover';
 
 @NgModule({
   declarations: [
@@ -48,27 +51,30 @@ import { MatExpansionModule } from '@angular/material/expansion';
     PaymentComponent,
     CreatePaymentModModalComponent,
     PaymentModificationsComponent,
-    TransactionItemComponent
+    TransactionItemComponent,
   ],
-    imports: [
-        BrowserModule,
-        BrowserAnimationsModule,
-        ToastrModule.forRoot(),
-        MatInputModule,
-        MatButtonModule,
-        MatDialogModule,
-        FormsModule,
-        ReactiveFormsModule,
-        MatCheckboxModule,
-        FontAwesomeModule,
-        ConfirmationPopoverModule.forRoot({
-            confirmButtonType: 'danger', // set defaults here
-        }),
-        MatOptionModule,
-        MatSelectModule,
-        MatCardModule,
-        MatExpansionModule,
-    ],
+  imports: [
+    BrowserModule,
+    BrowserAnimationsModule,
+    ToastrModule.forRoot(),
+    MatInputModule,
+    MatButtonModule,
+    MatDialogModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatCheckboxModule,
+    FontAwesomeModule,
+    ConfirmationPopoverModule.forRoot({
+      confirmButtonType: 'danger', // set defaults here
+    }),
+    MatOptionModule,
+    MatSelectModule,
+    MatCardModule,
+    MatExpansionModule,
+    IconModule,
+    PopoverModule,
+    SatPopoverModule
+  ],
   providers: [],
   bootstrap: [AppComponent]
 })

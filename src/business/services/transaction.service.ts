@@ -80,7 +80,7 @@ export default class TransactionService extends EntityService<Transaction> {
         return [member, membersUidPaymentMap.get(member.uid) ?? 0];
       }));
 
-      this.generateTransactions(membersPaymentMap, payedUser, payment, eventUid);
+      await this.generateTransactions(membersPaymentMap, payedUser, payment, eventUid, defaultPayment);
     }
 
     const usersMap = new Map(users.map((user => [user.uid, user])));
@@ -89,13 +89,15 @@ export default class TransactionService extends EntityService<Transaction> {
     return this.getEntities();
   }
 
-  private generateTransactions(membersPaymentMap: Map<User, number>, toUser: User, payment: Payment, eventUid: string): void {
+  private async generateTransactions(membersPaymentMap: Map<User, number>, toUser: User, payment: Payment, eventUid: string, originalValue: number): Promise<void> {
     for (const [fromUser, memberPayment] of Array.from(membersPaymentMap.entries())) {
       if (fromUser.uid === toUser.uid) {
         continue;
       }
 
-      const transaction = Transaction.create(memberPayment, payment, toUser, fromUser, eventUid);
+      const modifications = await this._calculationModificationService.getEntitiesByPaymentAndUserId(payment.uid, fromUser.uid);
+
+      const transaction = Transaction.create(memberPayment, payment, toUser, fromUser, eventUid, modifications, originalValue);
       this.addOrUpdateEntity(transaction);
     }
   }

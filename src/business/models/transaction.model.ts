@@ -1,6 +1,7 @@
 import Model from '@business/core/model';
 import User from '@business/models/user.model';
 import Payment from '@business/models/payment.model';
+import CalculationModification from '@business/models/modifications/calculation-modification';
 
 export default class Transaction extends Model {
   private _money: number;
@@ -9,8 +10,10 @@ export default class Transaction extends Model {
   private _reasonPrefix: string = '';
   private readonly _payment: Payment;
   private readonly _eventUid: string
+  private readonly _modifications: CalculationModification[] = [];
+  private readonly _originalValue: number;
 
-  private constructor(uid: string, money: number, payment: Payment, to: User, from: User, eventUid: string) {
+  private constructor(uid: string, money: number, payment: Payment, to: User, from: User, eventUid: string, modifications: CalculationModification[] = [], originalValue: number = 1) {
     super(uid);
 
     this._uid = uid;
@@ -19,13 +22,19 @@ export default class Transaction extends Model {
     this._from = from;
     this._payment = payment;
     this._eventUid = eventUid;
+    this._modifications = modifications;
+    this._originalValue = originalValue;
   }
 
-  public static create(money: number, payment: Payment, to: User, from: User, eventUid: string): Transaction {
+  public static create(money: number, payment: Payment, to: User, from: User, eventUid: string, modifications: CalculationModification[], originalValue: number = 1): Transaction {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const uid = self.crypto.randomUUID();
-    return new Transaction(uid, money, payment, to, from, eventUid);
+    return new Transaction(uid, money, payment, to, from, eventUid, modifications, originalValue);
+  }
+
+  public get modifications(): CalculationModification[] {
+    return this._modifications;
   }
 
   public set from(user: User) {
@@ -58,6 +67,10 @@ export default class Transaction extends Model {
 
   public get payment(): Payment {
     return this._payment;
+  }
+
+  public get originalValue(): number {
+    return this._originalValue;
   }
 
   public getText(): string {

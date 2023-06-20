@@ -146,3 +146,28 @@
     transform: rotate(90deg);
   }
 }
+
+.modification-user-name {
+  flex-shrink: 0;
+}
+
+.modification-comment {
+  padding: 0 15px 0 10px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 11px;
+  position: relative;
+
+  &:before {
+    content: '(';
+    display: inline;
+  }
+
+  &:after {
+    content: ')';
+    display: inline;
+    position: absolute;
+    right: 9px;
+  }
+}
