@@ -1,7 +1,7 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, SimpleChanges } from '@angular/core';
 import User from '@business/models/user.model';
 import Transaction from '@business/models/transaction.model';
-import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { ToastrService } from 'ngx-toastr';
 
 export interface IUserTransactionItem {
@@ -15,14 +15,31 @@ export interface IUserTransactionItem {
   styleUrls: ['./transaction-item.component.scss']
 })
 export class TransactionItemComponent {
+  public _transactions: Transaction[] = [];
+
   @Input() user!: User;
-  @Input() transactions!: Transaction[];
+
+  @Input() set transactions(transactions: Transaction[]) {
+    this._transactions = transactions;
+    this.userTransactions = this.getUserTransactions();
+  }
+
   @Input() transactionsMap!: Map<User, Map<User, number>>;
   public arrowIcon = faChevronDown;
+  public infoIcon = faInfoCircle;
+  public userTransactions: IUserTransactionItem[] = [];
 
   public isHiddenDetails: Map<string, boolean> = new Map();
 
   constructor(public toastr: ToastrService) {
+  }
+
+  ngOnInit() {
+    this.userTransactions = this.getUserTransactions();
+  }
+
+  get transactions(): Transaction[] {
+    return this._transactions;
   }
 
   public toggleIsHiddenDetails(transactionItem: IUserTransactionItem): void {

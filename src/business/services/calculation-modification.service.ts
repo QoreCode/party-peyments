@@ -26,11 +26,12 @@ export default class CalculationModificationService extends EntityService<Calcul
     const paymentUid = this.extractValue(data, 'paymentUid');
     const usersUid = this.extractValue(data, 'usersUid');
     const mathExpression = this.extractValue(data, 'mathExpression');
+    const comment = data.comment;
 
     if (mathExpression > 0) {
-      return new PositiveCalculationModification(uid, paymentUid, usersUid, mathExpression);
+      return new PositiveCalculationModification(uid, paymentUid, usersUid, mathExpression, comment);
     }
 
-    return new NegativeCalculationModification(uid, paymentUid, usersUid, mathExpression);
+    return new NegativeCalculationModification(uid, paymentUid, usersUid, mathExpression, comment);
   }
 }

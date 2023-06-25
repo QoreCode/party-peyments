@@ -29,7 +29,13 @@
       <ng-template ngFor let-modification [ngForOf]="calculationModifications">
         <div class="modification calculation-modification">
           <div class="modification-label" (click)="editModification(modification)">
-            {{ involvedUsersName(modification) }}: <strong class="modification-label-strong">{{ modification.mathExpression }} UAH</strong>
+            <span class="modification-user-name">
+              {{ involvedUsersName(modification) }}: <strong class="modification-label-strong">{{ modification.mathExpression }}
+              UAH</strong>
+            </span>
+            <span class="modification-comment" *ngIf="modification.hasComment" [title]="modification.comment">
+              {{ modification.comment }}
+            </span>
           </div>
           <fa-icon class="modification-remove" [icon]="deleteIcon" (click)="removeCalculationModification(modification.uid)"></fa-icon>
         </div>

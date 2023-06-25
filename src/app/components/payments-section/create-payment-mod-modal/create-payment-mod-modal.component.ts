@@ -37,6 +37,10 @@ export class CreatePaymentModModalComponent implements OnDestroy, OnInit {
     Validators.required,
     Validators.minLength(1),
   ]);
+  public commentToCalcSelectControl = new FormControl<string | undefined>(undefined, [
+    Validators.minLength(1),
+    Validators.maxLength(80)
+  ]);
 
   public userServiceSubscription!: Subscription;
   public excludeModSubscription!: Subscription;
@@ -53,6 +57,7 @@ export class CreatePaymentModModalComponent implements OnDestroy, OnInit {
     if (this.data.modification !== undefined) {
       this.usersToCalcSelectControl.setValue(this.data.modification.usersUid);
       this.priceToCalcSelectControl.setValue(this.data.modification.mathExpression);
+      this.commentToCalcSelectControl.setValue(this.data.modification.comment);
     }
   }
 
@@ -114,6 +119,11 @@ export class CreatePaymentModModalComponent implements OnDestroy, OnInit {
       return;
     }
 
+    if (!this.commentToCalcSelectControl.valid) {
+      this.commentToCalcSelectControl.markAsTouched();
+      return;
+    }
+
     const userUids = this.usersToCalcSelectControl.getRawValue();
     const calcAmount = this.priceToCalcSelectControl.getRawValue();
     if (userUids === null || calcAmount === null) {
@@ -136,6 +146,11 @@ export class CreatePaymentModModalComponent implements OnDestroy, OnInit {
         calcModification = calcAmount > 0 ?
           PositiveCalculationModification.create(this.data.payment.uid, userUids, calcAmount) :
           NegativeCalculationModification.create(this.data.payment.uid, userUids, calcAmount);
+      }
+
+      const comment = this.commentToCalcSelectControl.getRawValue();
+      if (comment !== null) {
+        calcModification.comment = comment;
       }
 
       const calcFBDec = new FirebaseEntityServiceDecorator(this.calculationModService);
