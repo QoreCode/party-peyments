@@ -144,7 +144,7 @@
 }
 
 .transaction-item-label-wrap {
-  width: 35%;
+  width: calc(35% + 10px);
   padding: 0 10px;
   z-index: 2;
   background-color: white;
