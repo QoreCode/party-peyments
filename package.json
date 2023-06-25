@@ -26,7 +26,7 @@
     "@fortawesome/angular-fontawesome": "*",
     "@fortawesome/fontawesome-svg-core": "^6.3.0",
     "@fortawesome/free-solid-svg-icons": "^6.3.0",
-    "@ncstate/sat-popover": "^10.0.0",
+    "@igor2017/sat-popover": "^10.0.1",
     "angular-confirmation-popover": "^7.0.0",
     "firebase": "^9.17.1",
     "ngx-toastr": "^16.0.2",

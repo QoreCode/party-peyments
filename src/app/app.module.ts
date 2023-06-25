@@ -33,7 +33,7 @@ import { TransactionItemComponent } from './components/transactions-section/tran
 import { MatExpansionModule } from '@angular/material/expansion';
 import { PopoverModule } from '@coreui/angular';
 import { IconModule } from '@coreui/icons-angular';
-import { SatPopoverModule } from '@ncstate/sat-popover';
+import { SatPopoverModule } from '@igor2017/sat-popover';
 
 @NgModule({
   declarations: [
