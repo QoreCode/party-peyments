@@ -65,6 +65,8 @@ export default abstract class CalculationModification extends Model {
    * @param membersMap Map<userId, payment> **/
   public abstract applyModification(membersMap: Map<string, number>, paymentCheck: number): Map<string, number>;
 
+  public abstract isNegative(): boolean;
+
   public toJson(): Record<string, any> {
     const requiredData = {
       uid: this.uid,

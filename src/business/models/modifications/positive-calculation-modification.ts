@@ -24,4 +24,8 @@ export default class PositiveCalculationModification extends CalculationModifica
 
     return membersMap;
   }
+
+  public isNegative(): boolean {
+    return false;
+  }
 }

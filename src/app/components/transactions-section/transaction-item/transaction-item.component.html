@@ -40,7 +40,7 @@
                                     <strong class="modifications-info-detail_value">{{ transactionItem.originalValue }} UAH</strong>
                                   </div>
                                   <ng-template ngFor let-modification [ngForOf]="transactionItem.modifications">
-                                    <div class="modifications-info-detail">
+                                    <div class="modifications-info-detail" *ngIf="!modification.isNegative()">
                                       <span class="modifications-info-detail_title">
                                         <span>{{ modification.comment || 'No reason' }}</span>
                                       </span>
@@ -60,7 +60,7 @@
                 <div class="transaction-item opposite-money" *ngIf="getOppositeMoney(userTransaction)!==0">
                   <div class="transaction-item-label-wrap">
                     <div class="transaction-item-label"
-                         [title]="getOppositeMoneyTitle(userTransaction)">{{ getOppositeMoneyTitle(userTransaction) }}</div>
+                         [title]="getOppositeMoneyTitle(userTransaction)"><div>{{ getOppositeMoneyTitle(userTransaction) }}</div></div>
                   </div>
                   <div class="transaction-item-value">{{ getOppositeMoney(userTransaction)}} UAH</div>
                 </div>
