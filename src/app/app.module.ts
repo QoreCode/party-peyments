@@ -34,6 +34,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { PopoverModule } from '@coreui/angular';
 import { IconModule } from '@coreui/icons-angular';
 import { SatPopoverModule } from '@igor2017/sat-popover';
+import { EditUserModalComponent } from './components/users-section/edit-user-modal/edit-user-modal.component';
 
 @NgModule({
   declarations: [
@@ -52,6 +53,7 @@ import { SatPopoverModule } from '@igor2017/sat-popover';
     CreatePaymentModModalComponent,
     PaymentModificationsComponent,
     TransactionItemComponent,
+    EditUserModalComponent,
   ],
   imports: [
     BrowserModule,

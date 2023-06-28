@@ -14,7 +14,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 15px;
+  padding: 0 15px;
   cursor: pointer;
   background-color: white;
   transition: all 0.2s;
@@ -22,10 +22,30 @@
   border-radius: 0 10px 10px 0;
   color: #D50000;
   border-left: 1px solid #eee;
+  height: 45px;
 
   &:hover {
     color: #FFF;
     background-color: #D50000;
+  }
+}
+
+.edit-user{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 15px;
+  cursor: pointer;
+  background-color: white;
+  transition: all 0.2s;
+  font-size: 16px;
+  color: #304FFE;
+  border-left: 1px solid #eee;
+  height: 45px;
+
+  &:hover {
+    color: #FFF;
+    background-color: #304FFE;
   }
 }
 
@@ -109,7 +129,7 @@
       cursor: help;
     }
 
-    .info-icon{
+    .info-icon {
       color: #448AFF;
     }
   }
@@ -161,6 +181,10 @@
       display: none;
     }
   }
+}
+
+.user-card-nav {
+  display: flex;
 }
 
 ::ng-deep {
