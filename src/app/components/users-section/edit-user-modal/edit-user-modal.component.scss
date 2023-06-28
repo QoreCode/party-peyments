@@ -1,0 +1,29 @@
+.edit-user-modal-wrap {
+  width: 350px;
+  padding: 20px;
+}
+
+.edit-user-title {
+  margin: 0 0 15px 0;
+  text-align: center;
+
+  span {
+    text-decoration: underline;
+  }
+}
+
+.edit-user-modal-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.edit-user-modal-btns {
+  overflow: hidden;
+  display: flex;
+  margin-top: 30px;
+  justify-content: space-between;
+
+  button {
+    flex: 0.4;
+  }
+}

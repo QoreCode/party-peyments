@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import User from '@business/models/user.model';
 import {
-  faChevronDown, faInfoCircle, faXmark
+  faChevronDown, faInfoCircle, faPen, faXmark
 } from '@fortawesome/free-solid-svg-icons';
 import EventService from '@business/services/event.service';
 import FirebaseEntityServiceDecorator from '@business/core/firebase/firebase-entity-service.decorator';
@@ -17,6 +17,8 @@ import Payment from '@business/models/payment.model';
 import CalculationModificationService, { CalculationModification } from '@business/services/calculation-modification.service';
 import ExcludeModificationService from '@business/services/exclude-modification.service';
 import ExcludeModification from '@business/models/modifications/exclude-modification';
+import { MatDialog } from '@angular/material/dialog';
+import { EditUserModalComponent } from '@app/components/users-section/edit-user-modal/edit-user-modal.component';
 
 @Component({
   selector: 'app-user',
@@ -26,6 +28,7 @@ import ExcludeModification from '@business/models/modifications/exclude-modifica
 export class UserComponent implements OnDestroy, OnInit {
   @Input() user!: User;
   public closeIcon = faXmark;
+  public editIcon = faPen;
   public arrowIcon = faChevronDown;
   public isOpened: boolean = false;
   public allUsers: User[] = [];
@@ -49,6 +52,7 @@ export class UserComponent implements OnDestroy, OnInit {
               public toastr: ToastrService,
               public userService: UserService,
               public paymentService: PaymentService,
+              public dialog: MatDialog,
               public calculationService: CalculationModificationService,
               public excludeService: ExcludeModificationService,
               public applicationStateService: ApplicationStateService,
@@ -372,6 +376,10 @@ export class UserComponent implements OnDestroy, OnInit {
     }
 
     return payedUser.name;
+  }
+
+  public openEditUserDialog(): void {
+    this.dialog.open(EditUserModalComponent, { data: { user: this.user } });
   }
 
   public ngOnDestroy(): void {

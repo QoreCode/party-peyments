@@ -22,8 +22,14 @@ export class CreateUserModalComponent implements OnDestroy, OnInit {
   public usersSubscription!: Subscription;
 
   public nameInputControl = new FormControl('', [
-    Validators.required, Validators.minLength(3), Validators.maxLength(200)]);
+    Validators.required,
+    Validators.minLength(3),
+    Validators.maxLength(200)]
+  );
   public userIdsInputControl = new FormControl<string[]>([], [Validators.required]);
+  public cardNumberInputControl = new FormControl<undefined | string>(undefined, [
+    Validators.pattern(/^\d{12}$/)
+  ]);
 
   constructor(public dialogRef: MatDialogRef<CreateUserModalComponent>,
               public applicationStateService: ApplicationStateService,
@@ -56,14 +62,22 @@ export class CreateUserModalComponent implements OnDestroy, OnInit {
       return;
     }
 
+    if (!this.cardNumberInputControl.valid) {
+      this.cardNumberInputControl.markAsDirty();
+      this.cardNumberInputControl.markAsTouched();
+      return;
+    }
+
     const userName = this.nameInputControl.getRawValue();
     if (userName === null) {
       this.toastr.error('UserName is empty. Stop breaking my app!');
       return;
     }
 
+    const cardNumber = this.cardNumberInputControl.getRawValue() ? String(this.cardNumberInputControl.getRawValue()) : undefined;
+
     const userServiceFBDec = new FirebaseEntityServiceDecorator(this.userService);
-    const user = User.create(userName);
+    const user = User.create(userName, cardNumber);
     await userServiceFBDec.addOrUpdateEntity(user);
 
     const selectedEventUid = this.applicationStateService.getSelectedEventUid();

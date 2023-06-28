@@ -1,8 +1,8 @@
 import Model from '../core/model';
 
 export default class User extends Model {
-  private readonly _name: string;
-  private readonly _card?: string;
+  private _name: string;
+  private _card?: string;
 
   public constructor(uid: string, name: string, card?: string) {
     super(uid);
@@ -23,8 +23,16 @@ export default class User extends Model {
     return this._name;
   }
 
+  public set name(name: string) {
+    this._name = name;
+  }
+
   public get card(): string | undefined {
     return this._card;
+  }
+
+  public set card(card: string | undefined) {
+    this._card = card;
   }
 
   public get normalizedCard(): string | undefined {
