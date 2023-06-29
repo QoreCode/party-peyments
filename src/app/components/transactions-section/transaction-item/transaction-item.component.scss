@@ -109,7 +109,7 @@
   position: relative;
 
   &:not(:first-child) {
-    margin-top: 10px;
+    margin-top: 15px;
   }
 
   &.opposite-money {
@@ -143,17 +143,33 @@
   }
 }
 
+.transaction-item-label-wrap {
+  width: 35%;
+  padding: 0 10px;
+  z-index: 2;
+  background-color: white;
+}
+
+.transaction-item-label-text {
+  width: 100%;
+  display: inline-block;
+  overflow: hidden;
+}
+
 .transaction-item-label {
   font-size: 16px;
-  width: 50%;
-  text-align: right;
-  padding: 0 10px;
-  text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  background-color: white;
   z-index: 2;
-  max-width: 250px;
+  background-color: white;
+  display: flex;
+  text-align: right;
+  width: 100%;
+
+  div {
+    text-align: right;
+    width: 100%;
+  }
 }
 
 .transaction-item-value {
@@ -198,6 +214,79 @@
 
   &:hover {
     background-color: rgba(#304FFE, 0.2);
+  }
+}
+
+.transaction-item-label-icon {
+  padding: 0 0 0 6px;
+  color: #ccc;
+  cursor: help;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #111;
+  }
+}
+
+.modifications-info-detail {
+  position: relative;
+
+  &:not(:first-child) {
+    margin-top: 5px;
+  }
+
+  &_title {
+    width: 199px;
+    padding: 0 5px 0 10px;
+    display: inline-block;
+    text-align: right;
+    overflow: hidden;
+    white-space: nowrap;
+    z-index: 2;
+    background-color: white;
+    position: relative;
+    margin-right: 50px;
+
+    span {
+      padding-right: 2px;
+    }
+
+    &:after {
+      content: " ";
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      background-color: white;
+      z-index: 2;
+      padding: 0 5px 0 2px;
+      width: 0;
+      height: 100%;
+    }
+  }
+
+  &_value {
+    padding: 0 10px;
+    width: 100px;
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-align: left;
+    z-index: 2;
+    background-color: white;
+    position: relative;
+    margin-left: 50px;
+  }
+
+  &:before {
+    content: '';
+    display: block;
+    position: absolute;
+    bottom: 4px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    border-bottom: 2px dotted black;
+    z-index: 1;
   }
 }
 

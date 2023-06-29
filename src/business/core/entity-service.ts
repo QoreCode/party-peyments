@@ -17,7 +17,6 @@ export default abstract class EntityService<TEntity extends Model> implements IE
     this.entities.next(existedValues);
   }
 
-  // TODO: isDB - костыль, придумать механику isDB для сучностей
   public addOrUpdateEntity(entity: TEntity): void {
     const existedValues = this.entities.getValue();
     existedValues.set(entity.uid, entity);

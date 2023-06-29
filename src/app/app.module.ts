@@ -31,6 +31,10 @@ import { CreatePaymentModModalComponent } from './components/payments-section/cr
 import { PaymentModificationsComponent } from './components/payments-section/payment/payment-modifications/payment-modifications.component';
 import { TransactionItemComponent } from './components/transactions-section/transaction-item/transaction-item.component';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { PopoverModule } from '@coreui/angular';
+import { IconModule } from '@coreui/icons-angular';
+import { SatPopoverModule } from '@igor2017/sat-popover';
+import { EditUserModalComponent } from './components/users-section/edit-user-modal/edit-user-modal.component';
 
 @NgModule({
   declarations: [
@@ -48,27 +52,31 @@ import { MatExpansionModule } from '@angular/material/expansion';
     PaymentComponent,
     CreatePaymentModModalComponent,
     PaymentModificationsComponent,
-    TransactionItemComponent
+    TransactionItemComponent,
+    EditUserModalComponent,
   ],
-    imports: [
-        BrowserModule,
-        BrowserAnimationsModule,
-        ToastrModule.forRoot(),
-        MatInputModule,
-        MatButtonModule,
-        MatDialogModule,
-        FormsModule,
-        ReactiveFormsModule,
-        MatCheckboxModule,
-        FontAwesomeModule,
-        ConfirmationPopoverModule.forRoot({
-            confirmButtonType: 'danger', // set defaults here
-        }),
-        MatOptionModule,
-        MatSelectModule,
-        MatCardModule,
-        MatExpansionModule,
-    ],
+  imports: [
+    BrowserModule,
+    BrowserAnimationsModule,
+    ToastrModule.forRoot(),
+    MatInputModule,
+    MatButtonModule,
+    MatDialogModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatCheckboxModule,
+    FontAwesomeModule,
+    ConfirmationPopoverModule.forRoot({
+      confirmButtonType: 'danger', // set defaults here
+    }),
+    MatOptionModule,
+    MatSelectModule,
+    MatCardModule,
+    MatExpansionModule,
+    IconModule,
+    PopoverModule,
+    SatPopoverModule
+  ],
   providers: [],
   bootstrap: [AppComponent]
 })

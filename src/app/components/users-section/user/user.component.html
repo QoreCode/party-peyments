@@ -1,14 +1,21 @@
 <mat-card class="user-card">
   <div class="user-card-wrap">
     <div class="user-name" [title]="user.name">{{user.name}}</div>
-    <div class="delete-user-wrap">
-      <div class="delete-user"
-           mwlConfirmationPopover
-           [popoverTitle]="'You are about to exclude this user'"
-           [popoverMessage]="deleteUserMessage"
-           placement="right"
-           (confirm)="deleteUser()">
-        <fa-icon [icon]="closeIcon"></fa-icon>
+    <div class="user-card-nav">
+      <div class="edit-user-wrap" (click)="openEditUserDialog()">
+        <div class="edit-user">
+          <fa-icon [icon]="editIcon"></fa-icon>
+        </div>
+      </div>
+      <div class="delete-user-wrap">
+        <div class="delete-user"
+             mwlConfirmationPopover
+             [popoverTitle]="'You are about to exclude this user'"
+             [popoverMessage]="deleteUserMessage"
+             placement="right"
+             (confirm)="deleteUser()">
+          <fa-icon [icon]="closeIcon"></fa-icon>
+        </div>
       </div>
     </div>
   </div>

@@ -72,7 +72,16 @@ export default class TransactionService extends EntityService<Transaction> {
 
       // расчет всех модификаций
       const calculationModifications = await this._calculationModificationService.getEntitiesByPaymentId(payment.uid);
-      for (const calculationModification of calculationModifications) {
+
+      const negativeModifications = calculationModifications.filter((modification) => modification.isNegative());
+      for (const calculationModification of negativeModifications) {
+        membersUidPaymentMap = calculationModification.applyModification(membersUidPaymentMap, payment.money);
+      }
+
+      const defaultMembersPaymentsMap = new Map(Array.from(membersUidPaymentMap.entries()));
+
+      const positiveModifications = calculationModifications.filter((modification) => !modification.isNegative());
+      for (const calculationModification of positiveModifications) {
         membersUidPaymentMap = calculationModification.applyModification(membersUidPaymentMap, payment.money);
       }
 
@@ -80,7 +89,7 @@ export default class TransactionService extends EntityService<Transaction> {
         return [member, membersUidPaymentMap.get(member.uid) ?? 0];
       }));
 
-      this.generateTransactions(membersPaymentMap, payedUser, payment, eventUid);
+      await this.generateTransactions(membersPaymentMap, payedUser, payment, eventUid, defaultMembersPaymentsMap);
     }
 
     const usersMap = new Map(users.map((user => [user.uid, user])));
@@ -89,13 +98,16 @@ export default class TransactionService extends EntityService<Transaction> {
     return this.getEntities();
   }
 
-  private generateTransactions(membersPaymentMap: Map<User, number>, toUser: User, payment: Payment, eventUid: string): void {
+  private async generateTransactions(membersPaymentMap: Map<User, number>, toUser: User, payment: Payment, eventUid: string, originalValueMap: Map<string, number>): Promise<void> {
     for (const [fromUser, memberPayment] of Array.from(membersPaymentMap.entries())) {
       if (fromUser.uid === toUser.uid) {
         continue;
       }
 
-      const transaction = Transaction.create(memberPayment, payment, toUser, fromUser, eventUid);
+      const modifications = await this._calculationModificationService.getEntitiesByPaymentAndUserId(payment.uid, fromUser.uid);
+
+      const originalValue = originalValueMap.get(fromUser.uid) ?? 0;
+      const transaction = Transaction.create(memberPayment, payment, toUser, fromUser, eventUid, modifications, originalValue);
       this.addOrUpdateEntity(transaction);
     }
   }
