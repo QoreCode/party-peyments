@@ -24,11 +24,11 @@ export class CreateUserModalComponent implements OnDestroy, OnInit {
   public nameInputControl = new FormControl('', [
     Validators.required,
     Validators.minLength(3),
-    Validators.maxLength(200)]
-  );
+    Validators.maxLength(200)
+  ]);
   public userIdsInputControl = new FormControl<string[]>([], [Validators.required]);
   public cardNumberInputControl = new FormControl<undefined | string>(undefined, [
-    Validators.pattern(/^\d{12}$/)
+    Validators.pattern(/^\d{16}$/)
   ]);
 
   constructor(public dialogRef: MatDialogRef<CreateUserModalComponent>,
