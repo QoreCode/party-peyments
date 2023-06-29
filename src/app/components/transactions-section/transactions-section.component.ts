@@ -96,7 +96,7 @@ export class TransactionsSectionComponent implements OnDestroy, OnInit {
       this.involvedUsers = Array.from(involvedUsers.values());
 
       this.getTransactionsMap();
-    }, 500);
+    }, 200);
   }
 
   public ngOnDestroy(): void {
@@ -110,6 +110,8 @@ export class TransactionsSectionComponent implements OnDestroy, OnInit {
   public ngOnInit(): void {
     this.eventSubscription = this.eventService.subscribe(() => {
       this.setHasAttachedUsers();
+
+      this.debouncedTransactionGeneration();
     });
 
     this.paymentSubscription = this.paymentService.subscribe(async () => {
