@@ -22,12 +22,14 @@
 .events-section {
   border-bottom: 1px solid #444;
   display: block;
+  z-index: 2;
 }
 
 .payments-and-result {
   display: flex;
   margin-top: 20px;
   flex: 1;
+  z-index: 1;
 }
 
 .payments-section {
