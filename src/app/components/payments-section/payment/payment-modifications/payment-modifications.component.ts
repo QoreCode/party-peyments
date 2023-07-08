@@ -1,50 +1,47 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import Payment from '@business/models/payment.model';
-import User from '@business/models/user.model';
+import { Component, Input } from '@angular/core';
+import Payment from '@business/modules/payment/payment.model';
+import User from '@business/modules/user/user.model';
 import {
   CreatePaymentModModalComponent
 } from '@app/components/payments-section/create-payment-mod-modal/create-payment-mod-modal.component';
 import { MatDialog } from '@angular/material/dialog';
-import ExcludeModificationService from '@business/services/exclude-modification.service';
-import ExcludeModification from '@business/models/modifications/exclude-modification';
-import ApplicationStateService from '@business/services/application-state.service';
-import EventService from '@business/services/event.service';
+import ExcludeModification from '@business/modules/exclude-modification/exclude-modification.model';
 import { ToastrService } from 'ngx-toastr';
-import UserService from '@business/services/user.service';
-import { Subscription } from 'rxjs';
+import { combineLatest, map, Observable } from 'rxjs';
 import { faCirclePlus, faClose } from '@fortawesome/free-solid-svg-icons';
-import CalculationModificationService, { CalculationModification } from '@business/services/calculation-modification.service';
-import FirebaseEntityServiceDecorator from '@business/core/firebase/firebase-entity-service.decorator';
+import ApplicationStateService from '@services/application-state.service';
+import { ExcludeModificationService } from '@services/entity-services/exclude-modification.service';
+import { CalculationModificationService } from '@services/entity-services/calculation-modification.service';
+import CalculationModification from '@business/modules/calculation-modification/models/calculation-modification.model';
+import { UserEventPropertiesService } from '@services/entity-services/user-event-properties.service';
+import PartyEvent from '@business/modules/party-event/party-event.model';
+import ExcludeModificationController from '@business/modules/exclude-modification/exclude-modification.controller';
+import CalculationModificationController from '@business/modules/calculation-modification/calculation-modification.controller';
+import { UserService } from '@services/entity-services/user.service';
+import { PartyEventService } from '@services/entity-services/party-event.service';
 
 @Component({
   selector: 'app-payment-modifications',
   templateUrl: './payment-modifications.component.html',
   styleUrls: ['./payment-modifications.component.scss']
 })
-export class PaymentModificationsComponent implements OnDestroy, OnInit {
+export class PaymentModificationsComponent {
   @Input() payment!: Payment;
+  @Input() currentEvent!: PartyEvent;
 
   public deleteIcon = faClose;
   public addIcon = faCirclePlus;
 
-  public allUsers: User[] = [];
-  public usersToSelect: User[] = [];
-
-  public excludedModifications: ExcludeModification[] = [];
-  public calculationModifications: CalculationModification[] = [];
-
-  public eventServiceSubscription!: Subscription;
-  public userServiceSubscription!: Subscription;
-  public calcServiceSubscription!: Subscription;
-  public execServiceSubscription!: Subscription;
-
-  constructor(public dialog: MatDialog,
-              public toastr: ToastrService,
-              public applicationService: ApplicationStateService,
-              public eventService: EventService,
-              public userService: UserService,
-              public excludeModificationService: ExcludeModificationService,
-              public calculationModificationService: CalculationModificationService,
+  constructor(private excludeModificationController: ExcludeModificationController,
+              private calcModificationController: CalculationModificationController,
+              private applicationService: ApplicationStateService,
+              private partyEventService: PartyEventService,
+              private userService: UserService,
+              private userEventPropService: UserEventPropertiesService,
+              private excludeModificationService: ExcludeModificationService,
+              private calculationModificationService: CalculationModificationService,
+              private dialog: MatDialog,
+              private toastr: ToastrService,
   ) {
   }
 
@@ -57,34 +54,29 @@ export class PaymentModificationsComponent implements OnDestroy, OnInit {
     });
   }
 
-  // move it to some service
-  public async setUsersToSelect() {
-    const currentEventUid = this.applicationService.getSelectedEventUid();
-    if (currentEventUid === undefined) {
-      return;
-    }
+  public get usersToSelect(): Observable<User[]> {
+    return combineLatest([
+      this.userService.getAll(),
+      this.userEventPropService.getByParam('eventUid', this.currentEvent?.uid)
+    ]).pipe(
+      map(([users, userEventProps]) => {
+        const userEventSet = new Set(userEventProps.map((userEventProp) => userEventProp.userUid));
+        return users.filter((user: User) => userEventSet.has(user.uid));
+      })
+    )
+  }
 
-    const currentEvent = await this.eventService.getEntityByUid(currentEventUid);
-    if (currentEvent === undefined) {
-      this.toastr.error(`Selected event is undefined! Something went wrong!`);
-      return;
-    }
+  public get excludedModifications(): Observable<ExcludeModification[]> {
+    return this.excludeModificationService.getByParam('paymentUid', this.payment.uid);
+  }
 
-    const allUsersMap = new Map(this.allUsers.map((user: User) => [user.uid, user]));
-    this.usersToSelect = currentEvent.involvedUserUids.reduce((users: User[], userUid: string) => {
-      const user = allUsersMap.get(userUid);
-      if (user !== undefined) {
-        users.push(user);
-      }
-
-      return users;
-    }, []);
+  public get calculationModifications(): Observable<CalculationModification[]> {
+    return this.calculationModificationService.getByParam('paymentUid', this.payment.uid);
   }
 
   public async removeExcludedModification(modificationUid: string): Promise<void> {
     try {
-      const fbModDec = new FirebaseEntityServiceDecorator(this.excludeModificationService);
-      await fbModDec.deleteEntity(modificationUid);
+      await this.excludeModificationController.delete(modificationUid);
 
       this.toastr.success(`Exclude modification successfully deleted`);
     } catch (e) {
@@ -98,8 +90,7 @@ export class PaymentModificationsComponent implements OnDestroy, OnInit {
 
   public async removeCalculationModification(modificationUid: string): Promise<void> {
     try {
-      const fbModDec = new FirebaseEntityServiceDecorator(this.calculationModificationService);
-      await fbModDec.deleteEntity(modificationUid);
+      await this.calcModificationController.delete(modificationUid);
 
       this.toastr.success(`Calculation modification successfully deleted`);
     } catch (e) {
@@ -112,7 +103,7 @@ export class PaymentModificationsComponent implements OnDestroy, OnInit {
   }
 
   public involvedUserName(modification: ExcludeModification): string {
-    const user = this.allUsers.find((user: User) => user.uid === modification.userUid);
+    const user = this.userService.entities.find((user: User) => user.uid === modification.userUid);
     if (user !== undefined) {
       return user.name;
     }
@@ -121,11 +112,11 @@ export class PaymentModificationsComponent implements OnDestroy, OnInit {
   }
 
   public involvedUsersName(modification: CalculationModification): string {
-    const allUsersSet = new Map(this.allUsers.map((user: User) => [user.uid, user]));
+    const allUsersSet = new Map(this.userService.entities.map((user: User) => [user.uid, user]));
     const users = modification.usersUid.map((userUid: string) => {
       const user = allUsersSet.get(userUid);
       if (user === undefined) {
-        this.toastr.error(`Can't find user with id ${ userUid }`);
+        this.toastr.error(`Can't find user with id 1 ${ userUid }`);
         return userUid;
       }
 
@@ -135,8 +126,12 @@ export class PaymentModificationsComponent implements OnDestroy, OnInit {
     return users.join(', ');
   }
 
-  public get isNoModifications(): boolean {
-    return this.excludedModifications.length === 0 && this.calculationModifications.length === 0;
+  public get isNoModifications(): Observable<boolean> {
+    return combineLatest([this.excludedModifications, this.calculationModifications]).pipe(
+      map(([excludedModifications, calculationModifications]) => {
+        return excludedModifications.length === 0 && calculationModifications.length === 0;
+      })
+    )
   }
 
   public openDialog(): void {
@@ -144,29 +139,6 @@ export class PaymentModificationsComponent implements OnDestroy, OnInit {
       data: {
         payment: this.payment
       }
-    });
-  }
-
-  public ngOnDestroy(): void {
-    this.userServiceSubscription.unsubscribe();
-    this.eventServiceSubscription.unsubscribe();
-    this.execServiceSubscription.unsubscribe();
-    this.calcServiceSubscription.unsubscribe();
-  }
-
-  public ngOnInit(): void {
-    this.userServiceSubscription = this.userService.subscribe((allUsers: Map<string, User>) => {
-      this.allUsers = Array.from(allUsers.values());
-    });
-
-    this.eventServiceSubscription = this.eventService.subscribe(() => this.setUsersToSelect());
-
-    this.execServiceSubscription = this.excludeModificationService.subscribe(async () => {
-      this.excludedModifications = await this.excludeModificationService.getEntitiesByPaymentId(this.payment.uid);
-    });
-
-    this.calcServiceSubscription = this.calculationModificationService.subscribe(async () => {
-      this.calculationModifications = await this.calculationModificationService.getEntitiesByPaymentId(this.payment.uid);
     });
   }
 }

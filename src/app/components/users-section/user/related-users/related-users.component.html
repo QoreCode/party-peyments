@@ -1,0 +1,30 @@
+<mat-card class="related-users-wrap" [ngClass]="{isOpened: isOpened}">
+  <div class="payed-for">
+    <div *ngIf="(isSomeonePayedForThisUser | async) ; else isNobodyToSelectBlock" class="no-user-text">
+      {{ (payedUserName| async)?.join(', ') }} already payed for you
+    </div>
+    <ng-template #isNobodyToSelectBlock>
+      <div *ngIf="(isNobodyToSelect | async) ; else elseBlock" class="no-user-text">No users you can pay for</div>
+    </ng-template>
+    <ng-template #elseBlock>
+      <div class="payed-for-label">Pay for:</div>
+      <mat-form-field class="users-selection" appearance="fill" [title]='usersTitle | async'>
+        <mat-select [formControl]="userIdsInputControl" multiple [placeholder]="'Choose user'" (selectionChange)="addRelatedUser()">
+          <ng-template *ngIf="(usersToSelect | async)?.length!==0" ngFor let-user [ngForOf]="usersToSelect | async">
+            <mat-option [value]="user.uid" [disabled]="(isDisabledOption(user.uid) | async)!">
+              <span>{{ user.name }}</span>
+              <fa-icon *ngIf="isDisabledOption(user.uid) | async" [icon]="infoIcon" [title]="(getOptionDisableHelpTitle(user.uid) | async)!"
+                       class="info-disabled-icon"></fa-icon>
+              <fa-icon *ngIf="!(isDisabledOption(user.uid) | async) && (getOptionHelpTitle(user) | async)?.length !== 0"
+                       [icon]="infoIcon" [title]="(getOptionHelpTitle(user) | async)!"
+                       class="info-icon"></fa-icon>
+            </mat-option>
+          </ng-template>
+        </mat-select>
+      </mat-form-field>
+    </ng-template>
+  </div>
+  <div class="related-users-down-icon" (click)="toggleRelatedUsers()">
+    <fa-icon [icon]="arrowIcon"></fa-icon>
+  </div>
+</mat-card>

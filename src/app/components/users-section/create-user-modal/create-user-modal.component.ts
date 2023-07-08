@@ -1,14 +1,16 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
-import FirebaseEntityServiceDecorator from '@business/core/firebase/firebase-entity-service.decorator';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialogRef } from '@angular/material/dialog';
-import UserService from '@business/services/user.service';
-import User from '@business/models/user.model';
-import EventService from '@business/services/event.service';
-import ApplicationStateService from '@business/services/application-state.service';
-import UserEventProperties from '@business/models/user-event-properties.model';
-import { Subscription } from 'rxjs';
+import User from '@business/modules/user/user.model';
+import UserEventProperties from '@business/modules/user-event-properties/user-event-properties.model';
+import { map, Observable, Subscription } from 'rxjs';
+import ApplicationStateService from '@services/application-state.service';
+import { UserService } from '@services/entity-services/user.service';
+import UserController from '@business/modules/user/user.controller';
+import { combineLatest } from 'rxjs';
+import { UserEventPropertiesService } from '@services/entity-services/user-event-properties.service';
+import UserEventPropertiesController from '@business/modules/user-event-properties/user-event-properties.controller';
 
 @Component({
   selector: 'app-create-user-modal',
@@ -31,11 +33,13 @@ export class CreateUserModalComponent implements OnDestroy, OnInit {
     Validators.pattern(/^\d{16}$/)
   ]);
 
-  constructor(public dialogRef: MatDialogRef<CreateUserModalComponent>,
-              public applicationStateService: ApplicationStateService,
-              public toastr: ToastrService,
-              public eventService: EventService,
-              public userService: UserService
+  constructor(private userController: UserController,
+              private userEventPropsController: UserEventPropertiesController,
+              private applicationStateService: ApplicationStateService,
+              private userEventPropsService: UserEventPropertiesService,
+              private userService: UserService,
+              private toastr: ToastrService,
+              private dialogRef: MatDialogRef<CreateUserModalComponent>,
   ) {
   }
 
@@ -68,6 +72,12 @@ export class CreateUserModalComponent implements OnDestroy, OnInit {
       return;
     }
 
+    const selectedPartyEventUid = this.applicationStateService.getSelectedPartyEventUid();
+    if (selectedPartyEventUid === undefined) {
+      this.toastr.error('Selected Event is undefined. Stop breaking my app!');
+      return;
+    }
+
     const userName = this.nameInputControl.getRawValue();
     if (userName === null) {
       this.toastr.error('UserName is empty. Stop breaking my app!');
@@ -76,26 +86,7 @@ export class CreateUserModalComponent implements OnDestroy, OnInit {
 
     const cardNumber = this.cardNumberInputControl.getRawValue() ? String(this.cardNumberInputControl.getRawValue()) : undefined;
 
-    const userServiceFBDec = new FirebaseEntityServiceDecorator(this.userService);
-    const user = User.create(userName, cardNumber);
-    await userServiceFBDec.addOrUpdateEntity(user);
-
-    const selectedEventUid = this.applicationStateService.getSelectedEventUid();
-    if (selectedEventUid === undefined) {
-      this.toastr.error('Selected Event is undefined. Stop breaking my app!');
-      return;
-    }
-
-    const event = await this.eventService.getEntityByUid(selectedEventUid);
-    if (event === undefined) {
-      this.toastr.error('Event is undefined. Stop breaking my app!');
-      return;
-    }
-
-    await event.addUserUid(user.uid);
-
-    const eventServiceFBDec = new FirebaseEntityServiceDecorator(this.eventService);
-    await eventServiceFBDec.addOrUpdateEntity(event);
+    await this.userController.create(selectedPartyEventUid, userName, cardNumber);
 
     this.toastr.success('User was successfully created');
     this.dialogRef.close();
@@ -118,55 +109,44 @@ export class CreateUserModalComponent implements OnDestroy, OnInit {
       return;
     }
 
-    const selectedEventUid = this.applicationStateService.getSelectedEventUid();
+    const selectedEventUid = this.applicationStateService.getSelectedPartyEventUid();
     if (selectedEventUid === undefined) {
       this.toastr.error('Selected Event is undefined. Stop breaking my app!');
       return;
     }
 
-    const event = await this.eventService.getEntityByUid(selectedEventUid);
-    if (event === undefined) {
-      this.toastr.error('Event is undefined. Stop breaking my app!');
-      return;
-    }
-
-    await event.addUsersUid(selectedUsers);
-
-    const eventServiceFBDec = new FirebaseEntityServiceDecorator(this.eventService);
-    await eventServiceFBDec.addOrUpdateEntity(event);
+    await this.userEventPropsController.createIfNotExist(selectedEventUid, selectedUsers);
 
     this.toastr.success('User was successfully created');
     this.dialogRef.close();
   }
 
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     this.usersSubscription.unsubscribe();
   }
 
-  async ngOnInit(): Promise<void> {
-    this.userService.subscribe(async () => {
-      const selectedEventUid = this.applicationStateService.getSelectedEventUid();
-      if (selectedEventUid === undefined) {
-        this.toastr.error('Selected Event is undefined. Stop breaking my app!');
-        return;
-      }
-
-      const event = await this.eventService.getEntityByUid(selectedEventUid);
-      if (event === undefined) {
-        this.toastr.error('Event is undefined. Stop breaking my app!');
-        return;
-      }
-
-      const alreadyAttachedUsers = new Set(event.usersEventProperties.map((userEventProperties: UserEventProperties) => {
-        return userEventProperties.userUid;
-      }));
-
-      const users = await this.userService.getEntities();
-      this.users = users.filter((user: User) => !alreadyAttachedUsers.has(user.uid));
-
-      if (this.users.length === 0) {
+  public ngOnInit(): void {
+    this.usersSubscription = this.usersToSelect.subscribe((usersToSelect: User[]) => {
+      if (usersToSelect.length === 0) {
         this.isNewUserState = true;
       }
+
+      this.users = usersToSelect;
     })
+  }
+
+  public get usersToSelect(): Observable<User[]> {
+    return combineLatest([
+      this.userService.getByParam('isActive', true),
+      this.userEventPropsService.getByParam('eventUid', this.applicationStateService.getSelectedPartyEventUid())
+    ]).pipe(
+      map(([users, userEventProps]) => {
+        const alreadyAttachedUsers = new Set(userEventProps.map((userEventProperties: UserEventProperties) => {
+          return userEventProperties.userUid;
+        }));
+
+        return users.filter((user: User) => !alreadyAttachedUsers.has(user.uid));
+      })
+    );
   }
 }

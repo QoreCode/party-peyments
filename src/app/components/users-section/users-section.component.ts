@@ -1,16 +1,17 @@
-import { Component, OnDestroy } from '@angular/core';
-import ApplicationStateService, { ApplicationState } from '@business/services/application-state.service';
+import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
-import UserService from '@business/services/user.service';
-import User from '@business/models/user.model';
-import { Subscription } from 'rxjs';
-import EventService from '@business/services/event.service';
+import User from '@business/modules/user/user.model';
+import { combineLatest, map, Observable, Subscription } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
-import FirebaseEntityServiceDecorator from '@business/core/firebase/firebase-entity-service.decorator';
-import UserEventProperties from '@business/models/user-event-properties.model';
+import UserEventProperties from '@business/modules/user-event-properties/user-event-properties.model';
 import { MatDialog } from '@angular/material/dialog';
 import { CreateUserModalComponent } from '@app/components/users-section/create-user-modal/create-user-modal.component';
-import PartyEvent from '@business/models/party-event.model';
+import UserController from '@business/modules/user/user.controller';
+import { UserService } from '@services/entity-services/user.service';
+import { UserEventPropertiesService } from '@services/entity-services/user-event-properties.service';
+import ApplicationStateService, { ApplicationState } from '@services/application-state.service';
+import PartyEvent from '@business/modules/party-event/party-event.model';
+import { PartyEventService } from '@services/entity-services/party-event.service';
 
 @Component({
   selector: 'app-users-section',
@@ -19,72 +20,64 @@ import PartyEvent from '@business/models/party-event.model';
 })
 export class UsersSectionComponent implements OnDestroy {
   public closeIcon = faPlus;
-  public users: User[] = [];
   public usersSubscription: Subscription;
-  public eventsSubscription: Subscription;
+  public currentEvent?: PartyEvent;
 
-  constructor(public applicationStateService: ApplicationStateService,
-              public eventService: EventService,
-              public toastr: ToastrService,
-              public dialog: MatDialog,
-              public userService: UserService) {
-
-    const fbDec = new FirebaseEntityServiceDecorator(this.userService);
-    fbDec.getEntities();
-
+  constructor(private userController: UserController,
+              private partyEventService: PartyEventService,
+              private applicationStateService: ApplicationStateService,
+              private userEventPropertiesService: UserEventPropertiesService,
+              private userService: UserService,
+              private toastr: ToastrService,
+              private dialog: MatDialog
+  ) {
     this.usersSubscription = this.applicationStateService.subscribe((applicationState: ApplicationState) => {
-      const selectedEventUid = applicationState.selectedEventUid;
-      if (selectedEventUid === undefined) {
+      if (applicationState.selectedPartyEventUid === undefined) {
         return;
       }
 
-      this.updateUsers(selectedEventUid);
+      const partyEvent = this.partyEventService.entities.find((partyEvent: PartyEvent) => partyEvent.uid === applicationState.selectedPartyEventUid);
+      if (partyEvent === undefined) {
+        this.toastr.error(`Party Event with id ${ applicationState.selectedPartyEventUid } isn't defined`);
+        return;
+      }
+
+      this.currentEvent = partyEvent;
     });
-
-    this.eventsSubscription = this.eventService.subscribe((allEventsMap: Map<string, PartyEvent>) => {
-      const selectedEventUid = this.applicationStateService.getSelectedEventUid();
-      if (selectedEventUid === undefined) {
-        return;
-      }
-
-      this.updateUsers(selectedEventUid);
-    })
   }
 
   public get hasSelectedEvent(): boolean {
-    return Boolean(this.applicationStateService.getSelectedEventUid());
+    return Boolean(this.applicationStateService.getSelectedPartyEventUid());
   }
 
   public ngOnDestroy(): void {
     this.usersSubscription.unsubscribe();
-    this.eventsSubscription.unsubscribe();
   }
 
   public openDialog(): void {
     this.dialog.open(CreateUserModalComponent);
   }
 
-  private async updateUsers(selectedEventUid: string): Promise<void> {
-    const event = await this.eventService.getEntityByUid(selectedEventUid);
-    if (event === undefined) {
-      return;
-    }
+  public get users(): Observable<User[]> {
+    return combineLatest([
+      this.userService.getAll(),
+      this.userEventPropertiesService.getByParam('eventUid', this.currentEvent?.uid)
+    ]).pipe(
+      map(([users, userEventProperties]) => {
+        if (userEventProperties.length === 0) return [];
 
-    if (event.usersEventProperties.length === 0) {
-      this.users = [];
-    }
+        const usersMap = new Map(users.map((user: User) => [user.uid, user]));
+        return userEventProperties.reduce((users: User[], userEventProperties: UserEventProperties) => {
+          const user = usersMap.get(userEventProperties.userUid);
+          if (user === undefined) {
+            this.toastr.error(`Can't find user with id 2 ${ userEventProperties.userUid }`);
+            return users;
+          }
 
-    const allUses = await this.userService.getEntities();
-    const allUsersMap = new Map(allUses.map((user: User) => [user.uid, user]));
-    this.users = event.usersEventProperties.reduce((users: User[], userEventProperties: UserEventProperties) => {
-      const user = allUsersMap.get(userEventProperties.userUid);
-      if (user === undefined) {
-        this.toastr.error(`Can't find user with id ${ userEventProperties.userUid }`);
-        return users;
-      }
-
-      users.push(user);
-      return users;
-    }, []);
+          users.push(user);
+          return users;
+        }, []);
+      })
+    )
   }
 }

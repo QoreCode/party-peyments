@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import Firebase from '@business/core/firebase/firebase.singleton';
+import Firebase from '@business/dal/firebase/firebase.connection';
 import { FormControl } from '@angular/forms';
 
 @Component({

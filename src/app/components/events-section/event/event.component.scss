@@ -1,8 +1,13 @@
 .event-wrap-card {
   border-radius: 50px;
   transition: box-shadow 0.2s;
+  border: 2px solid transparent;
 
   &.selected {
+    border: 2px solid #304FFE;
+  }
+
+  &:hover {
     box-shadow: 0 6px 13px rgba(0, 0, 0, 0.30), 0 5px 4px rgba(0, 0, 0, 0.22);
   }
 }
@@ -21,15 +26,6 @@
   cursor: pointer;
   transition: background-color 0.1s;
   min-width: 60px;
-
-  &:hover {
-    background-color: #304FFE;
-    color: white;
-
-    .event-date {
-      color: white;
-    }
-  }
 }
 
 .event-name {
