@@ -3,19 +3,19 @@
 </div>
 
 <ng-template #secondBlock>
-  <div class="section-event-message" *ngIf="!hasAttachedUsers; else thirdBlock">
+  <div class="section-event-message" *ngIf="!(hasAttachedUsers | async); else thirdBlock">
     <div>Please attach users to the event</div>
   </div>
 </ng-template>
 
 <ng-template #thirdBlock>
-  <div class="section-event-message" *ngIf="!hasPayments; else contentBlock">
+  <div class="section-event-message" *ngIf="!(hasPayments | async); else contentBlock">
     <div>Please create some payments to get result</div>
   </div>
 </ng-template>
 
 <ng-template #contentBlock>
-  <div class="user-section-wrap">
+  <div class="user-section-wrap" *ngIf="transactions | async as transactions; else lolBlock">
     <ng-template ngFor let-user [ngForOf]="involvedUsers">
       <app-transaction-item class="transaction-item"
                             [user]="user"
@@ -23,4 +23,5 @@
                             [transactions]="transactions"></app-transaction-item>
     </ng-template>
   </div>
+  <ng-template #lolBlock>asd asd asd as</ng-template>
 </ng-template>

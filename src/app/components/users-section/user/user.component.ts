@@ -1,166 +1,53 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import User from '@business/models/user.model';
-import {
-  faChevronDown, faInfoCircle, faPen, faXmark
-} from '@fortawesome/free-solid-svg-icons';
-import EventService from '@business/services/event.service';
-import FirebaseEntityServiceDecorator from '@business/core/firebase/firebase-entity-service.decorator';
-import ApplicationStateService from '@business/services/application-state.service';
+import { Component, Input, OnInit } from '@angular/core';
+import User from '@business/modules/user/user.model';
+import { faPen, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { ToastrService } from 'ngx-toastr';
-import { FormControl } from '@angular/forms';
-import { Subscription } from 'rxjs';
-import UserService from '@business/services/user.service';
-import PartyEvent from '@business/models/party-event.model';
-import UserEventProperties from '@business/models/user-event-properties.model';
-import PaymentService from '@business/services/payment.service';
-import Payment from '@business/models/payment.model';
-import CalculationModificationService, { CalculationModification } from '@business/services/calculation-modification.service';
-import ExcludeModificationService from '@business/services/exclude-modification.service';
-import ExcludeModification from '@business/models/modifications/exclude-modification';
+import PartyEvent from '@business/modules/party-event/party-event.model';
+import Payment from '@business/modules/payment/payment.model';
+import ExcludeModification from '@business/modules/exclude-modification/exclude-modification.model';
 import { MatDialog } from '@angular/material/dialog';
 import { EditUserModalComponent } from '@app/components/users-section/edit-user-modal/edit-user-modal.component';
+import { PartyEventService } from '@services/entity-services/party-event.service';
+import { PaymentService } from '@services/entity-services/payment.service';
+import { CalculationModificationService } from '@services/entity-services/calculation-modification.service';
+import { ExcludeModificationService } from '@services/entity-services/exclude-modification.service';
+import UserController from '@business/modules/user/user.controller';
+import CalculationModification from '@business/modules/calculation-modification/models/calculation-modification.model';
 
 @Component({
   selector: 'app-user',
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.scss']
 })
-export class UserComponent implements OnDestroy, OnInit {
+export class UserComponent {
   @Input() user!: User;
+  @Input() currentEvent!: PartyEvent;
+
   public closeIcon = faXmark;
   public editIcon = faPen;
-  public arrowIcon = faChevronDown;
-  public isOpened: boolean = false;
+
   public allUsers: User[] = [];
-  public currentEvent!: PartyEvent;
-  public infoIcon = faInfoCircle;
-  public disabledUsers: Set<string> = new Set();
   public deleteUserMessage: string = '';
   public deleteUserTimerId: number | null = null;
-  public allPayments: Payment[] = [];
 
-  public usersSubscription!: Subscription;
-  public applicationSubscription!: Subscription;
-  public eventsSubscription!: Subscription;
-  public paymentSubscription!: Subscription;
-  public excludeSubscription!: Subscription;
-  public calculationSubscription!: Subscription;
-
-  public userIdsInputControl = new FormControl<string[]>([]);
-
-  constructor(public eventService: EventService,
-              public toastr: ToastrService,
-              public userService: UserService,
-              public paymentService: PaymentService,
-              public dialog: MatDialog,
-              public calculationService: CalculationModificationService,
-              public excludeService: ExcludeModificationService,
-              public applicationStateService: ApplicationStateService,
+  constructor(private userController: UserController,
+              private paymentService: PaymentService,
+              private partyEventService: PartyEventService,
+              private calculationService: CalculationModificationService,
+              private excludeService: ExcludeModificationService,
+              private toastr: ToastrService,
+              private dialog: MatDialog,
   ) {
   }
 
-  public get usersTitle(): string {
-    const selectedUserUidsSet = new Set(this.userIdsInputControl.getRawValue() ?? []);
-    const usersToPayFor = this.allUsers.reduce((titleParts: string[], user: User) => {
-      if (selectedUserUidsSet.has(user.uid)) {
-        titleParts.push(user.name);
-      }
-
-      return titleParts;
-    }, []);
-
-    if (usersToPayFor.length === 0) {
-      return '';
-    }
-
-    if (usersToPayFor.length === this.usersToSelect.length) {
-      return `You are gonna pay for all users in this event!`;
-    }
-
-    return `You are gonna pay for: ${ usersToPayFor.join(', ') }`;
-  }
-
-  public async ngOnInit() {
-    await this.setCurrentEvent();
-
-    const eventProperties = this.currentEvent.getUserEventPropertiesByUserUid(this.user.uid);
-    if (eventProperties === undefined) {
-      this.toastr.error(`Event is undefined. Something unbelievable is going on`);
-      return;
-    }
-
-    this.userIdsInputControl.setValue(eventProperties.payedForUserUids);
-
-    this.usersSubscription = this.userService.subscribe(async (users: Map<string, User>) => {
-      this.allUsers = Array.from(users.values());
-      this.setDisabledUsers();
-    });
-
-    this.applicationSubscription = this.applicationStateService.subscribe(async () => {
-      await this.setCurrentEvent();
-      await this.generateDeleteUserTitle();
-      this.allPayments = await this.paymentService.getPaymentsByEventUid(this.currentEvent.uid);
-    });
-
-    this.eventsSubscription = this.eventService.subscribe(async () => {
-      await this.setCurrentEvent();
-      await this.setDisabledUsers();
-      this.userIdsInputControl.setValue(eventProperties.payedForUserUids);
-      await this.generateDeleteUserTitle();
-    });
-
-    this.paymentSubscription = this.paymentService.subscribe(async () => {
-      this.allPayments = await this.paymentService.getPaymentsByEventUid(this.currentEvent.uid);
-      this.generateDeleteUserTitle();
-    });
-    this.excludeSubscription = this.excludeService.subscribe(() => this.generateDeleteUserTitle());
-    this.calculationSubscription = this.calculationService.subscribe(() => this.generateDeleteUserTitle());
-  }
-
-  public async addRelatedUser() {
-    const eventProperties = this.currentEvent.getUserEventPropertiesByUserUid(this.user.uid);
-    if (eventProperties === undefined) {
-      this.toastr.error(`Event is undefined. Something unbelievable is going on`);
-      return;
-    }
-
-    const selectedUsersUids = this.userIdsInputControl.getRawValue();
-    eventProperties.setUserUidForPayed(selectedUsersUids ?? []);
-
-    const eventServiceFBDec = new FirebaseEntityServiceDecorator(this.eventService);
-    await eventServiceFBDec.addOrUpdateEntity(this.currentEvent);
-
-    const selectedUsersUidSet = new Set(selectedUsersUids);
-    const relatedPayments = this.allPayments.filter((payment: Payment) => selectedUsersUidSet.has(payment.userUid));
-    if (relatedPayments.length !== 0) {
-      const paymentServiceFBDec = new FirebaseEntityServiceDecorator(this.paymentService);
-
-      await Promise.all(relatedPayments.map((payment: Payment) => {
-        payment.userUid = this.user.uid;
-        return paymentServiceFBDec.addOrUpdateEntity(payment)
-      }));
-    }
-
-    this.toastr.success(`Payed user was successfully added`);
-  }
-
-  public get usersToSelect(): User[] {
-    if (this.currentEvent === undefined) {
-      return [];
-    }
-
-    const involvedUsers = this.currentEvent.usersEventProperties.map((eventProperties: UserEventProperties) => eventProperties.userUid);
-    const involvedUsersSet = new Set(involvedUsers);
-    return this.allUsers.filter((user: User) => user.uid !== this.user?.uid && involvedUsersSet.has(user.uid));
-  }
-
+  // TODO: change it in task PP-43
   public async generateDeleteUserTitle(): Promise<void> {
     if (this.deleteUserTimerId !== null) {
       clearTimeout(this.deleteUserTimerId);
     }
 
     this.deleteUserTimerId = setTimeout(async () => {
-      const [payments, calculationModifications] = await this.getRelatedEntities();
+      const [payments, calculationModifications] = this.getRelatedEntities();
       let message = 'The user wont be removed, but will be excluded from this event and can be added later.';
 
       const allUsersMap = new Map(this.allUsers.map((user: User) => [user.uid, user]));
@@ -189,7 +76,7 @@ export class UserComponent implements OnDestroy, OnInit {
       }
 
       if (calculationModifications.length !== 0) {
-        const allPayments: Payment[] = await this.paymentService.getEntities();
+        const allPayments: Payment[] = this.paymentService.entities;
         const paymentsMap = new Map(allPayments.map((payment: Payment) => [payment.uid, payment]));
         const modMessages = calculationModifications.map((calcMod: CalculationModification) => {
           const payment = paymentsMap.get(calcMod.paymentUid);
@@ -204,7 +91,7 @@ export class UserComponent implements OnDestroy, OnInit {
       }
 
       this.deleteUserMessage = message;
-    }, 500);
+    }, 500) as any as number;
   }
 
   public async deleteUser(): Promise<void> {
@@ -213,30 +100,7 @@ export class UserComponent implements OnDestroy, OnInit {
         throw new Error(`User is undefined. Something unbelievable is going on`);
       }
 
-      await this.currentEvent.removeUserUid(this.user.uid);
-
-      const eventFBDec = new FirebaseEntityServiceDecorator(this.eventService);
-      await eventFBDec.addOrUpdateEntity(this.currentEvent);
-
-      const [payments, calculationModifications, excludeModifications] = await this.getRelatedEntities();
-
-      const paymentFBDec = new FirebaseEntityServiceDecorator(this.paymentService);
-      await Promise.all(payments.map((payment: Payment) => paymentFBDec.deleteEntity(payment.uid)));
-
-      const calcFBDec = new FirebaseEntityServiceDecorator(this.calculationService);
-      await Promise.all(calculationModifications.map((calculationModification: CalculationModification) => {
-        if (calculationModification.usersUid.length > 1) {
-          calculationModification.removeUser(this.user.uid);
-          return calcFBDec.addOrUpdateEntity(calculationModification);
-        }
-
-        return calcFBDec.deleteEntity(calculationModification.uid);
-      }));
-
-      const excludeFBDec = new FirebaseEntityServiceDecorator(this.calculationService);
-      await Promise.all(excludeModifications.map((excludeModification: ExcludeModification) => {
-        return excludeFBDec.deleteEntity(excludeModification.uid)
-      }));
+      await this.userController.delete(this.user.uid);
     } catch (e) {
       if (e instanceof Error) {
         this.toastr.error(e.message);
@@ -246,164 +110,31 @@ export class UserComponent implements OnDestroy, OnInit {
     }
   }
 
-  public async getRelatedEntities(): Promise<[Payment[], CalculationModification[], ExcludeModification[]]> {
-    const payments: Payment[] = await this.paymentService.getPaymentsByUserUid(this.user.uid, this.currentEvent.uid);
-    const allPayments: Payment[] = await this.paymentService.getEntities();
+  public getRelatedEntities(): [Payment[], CalculationModification[], ExcludeModification[]] {
+    const payments: Payment[] = this.paymentService.entities.filter((payment: Payment) => {
+      return payment.userUid === this.user.uid && payment.eventUid === this.currentEvent.uid;
+    });
 
-    const calculationModifications: CalculationModification[] = (await Promise.all(allPayments.map((payment: Payment) => {
-      return this.calculationService.getEntitiesByPaymentAndUserId(payment.uid, this.user.uid);
-    }))).flat();
+    const allPayments: Payment[] = this.paymentService.entities;
+    const allCalculationMods = this.calculationService.entities;
+    const allExcludeMods = this.excludeService.entities;
 
-    const excludeModifications: ExcludeModification[] = (await Promise.all(allPayments.map((payment: Payment) => {
-      return this.excludeService.getEntitiesByPaymentAndUserId(payment.uid, this.user.uid);
-    }))).flat();
+    const calculationModifications: CalculationModification[] = allPayments.map((payment: Payment) => {
+      return allCalculationMods.filter((calculation: CalculationModification) => {
+        return calculation.isUserInvolved(this.user.uid) && calculation.paymentUid === payment.uid;
+      });
+    }).flat();
+
+    const excludeModifications: ExcludeModification[] = allPayments.map((payment: Payment) => {
+      return allExcludeMods.filter((excludeMod: ExcludeModification) => {
+        return excludeMod.paymentUid === payment.uid && excludeMod.userUid === this.user.uid;
+      });
+    }).flat();
 
     return [payments, calculationModifications, excludeModifications];
   }
 
-  public toggleRelatedUsers() {
-    this.isOpened = !this.isOpened;
-  }
-
-  public async setDisabledUsers(): Promise<void> {
-    this.disabledUsers.clear();
-
-    if (this.usersToSelect.length === 0) {
-      return;
-    }
-
-    const payments = await this.paymentService.getPaymentsByEventUid(this.currentEvent.uid);
-    const payedUsers = new Set(payments.map((payment: Payment) => payment.userUid));
-
-    this.usersToSelect.forEach((userToSelect: User) => {
-      this.currentEvent.usersEventProperties.forEach((eventProperties: UserEventProperties) => {
-        // skip current user
-        if (eventProperties.userUid === this.user.uid) {
-          return;
-        }
-
-        // disable users who are pay by someone already
-        if (eventProperties.hasPayedUserUid(userToSelect.uid)) {
-          this.disabledUsers.add(userToSelect.uid);
-        }
-
-        // disable users who are pay for someone already
-        if (eventProperties.userUid === userToSelect.uid && eventProperties.payedForUserUids.length > 0) {
-          this.disabledUsers.add(userToSelect.uid);
-        }
-
-        // disable user (only one possible) who pay for current user
-        if (eventProperties.userUid === userToSelect.uid && eventProperties.hasPayedUserUid(this.user.uid)) {
-          this.disabledUsers.add(userToSelect.uid);
-        }
-      });
-    });
-  }
-
-  public getOptionHelpTitle(optionUser: User): string {
-    const relatedPayments = this.allPayments.filter((payment: Payment) => payment.userUid === optionUser.uid);
-    if (relatedPayments.length !== 0) {
-      return `User ${ this.user.name } will pay for payments: ${ relatedPayments.map((payment: Payment) => payment.name).join(', ') }`
-    }
-
-    return '';
-  }
-
-  public getOptionDisableHelpTitle(userOptionUid: string): string {
-    const allUsersEventProperties = this.currentEvent.usersEventProperties;
-
-    for (const eventProperties of allUsersEventProperties) {
-      const someonePayForCurrentUser = eventProperties.userUid === userOptionUid && eventProperties.hasPayedUserUid(this.user.uid);
-      if (someonePayForCurrentUser) {
-        return 'This user is already payed for you';
-      }
-
-      if (eventProperties.userUid === userOptionUid && eventProperties.payedForUserUids.length > 0) {
-        const allUsersMap = new Map(this.allUsers.map((user) => [user.uid, user.name]));
-        const usersNames = eventProperties.payedForUserUids.map((payedForUserUid: string) => allUsersMap.get(payedForUserUid));
-        if (usersNames.length > 0) {
-          return `This user is already pay for ${ usersNames.join(', ') }`;
-        } else {
-          return 'This user is already pay for someone';
-        }
-      }
-
-      const someonePayForOptionUser = eventProperties.hasPayedUserUid(userOptionUid);
-      if (someonePayForOptionUser) {
-        const user = this.allUsers.find((user: User) => user.uid === eventProperties.userUid);
-        if (user !== undefined) {
-          return `${ user.name } already payed for this user`;
-        } else {
-          return 'Someone already payed for this user';
-        }
-      }
-    }
-
-    const relatedPayments = this.allPayments.filter((payment: Payment) => payment.userUid === userOptionUid);
-    if (relatedPayments.length !== 0) {
-      return `User already pay for: ${ relatedPayments.map((payment: Payment) => payment.name).join(', ') }`
-    }
-
-    return `Something went wrong. This user disabled by mistake`
-  }
-
-  public isDisabledOption(userOptionUid: string): boolean {
-    return this.disabledUsers.has(userOptionUid);
-  }
-
-  public get isNobodyToSelect(): boolean {
-    if (this.usersToSelect.length === 0) {
-      return true;
-    }
-
-    return this.usersToSelect.length === this.disabledUsers.size;
-  }
-
-  public get isSomeonePayedForThisUser(): boolean {
-    if (this.currentEvent === undefined) return false;
-    return this.currentEvent.findWhoPayedForUser(this.user.uid) !== undefined;
-  }
-
-  public get payedUserName(): string {
-    const payedUserUid = this.currentEvent.findWhoPayedForUser(this.user.uid);
-    if (payedUserUid === undefined) {
-      return 'Some user';
-    }
-
-    const payedUser = this.allUsers.find((user: User) => user.uid === payedUserUid);
-    if (payedUser === undefined) {
-      return 'Some user';
-    }
-
-    return payedUser.name;
-  }
-
   public openEditUserDialog(): void {
     this.dialog.open(EditUserModalComponent, { data: { user: this.user } });
-  }
-
-  public ngOnDestroy(): void {
-    this.usersSubscription.unsubscribe();
-    this.eventsSubscription.unsubscribe();
-    this.applicationSubscription.unsubscribe();
-    this.paymentSubscription.unsubscribe();
-    this.calculationSubscription.unsubscribe();
-    this.excludeSubscription.unsubscribe();
-  }
-
-  private async setCurrentEvent() {
-    const selectedEventUid = this.applicationStateService.getSelectedEventUid();
-    if (selectedEventUid === undefined) {
-      this.toastr.error(`No selected events found. Stop breaking my app!`);
-      return;
-    }
-
-    const event = await this.eventService.getEntityByUid(selectedEventUid);
-    if (event === undefined) {
-      this.toastr.error(`Selected event no found. Stop breaking my app!`);
-      return;
-    }
-
-    this.currentEvent = event;
   }
 }

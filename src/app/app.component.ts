@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import Firebase from '@business/core/firebase/firebase.singleton';
+import Firebase from '@business/dal/firebase/firebase.connection';
 import { ToastrService } from 'ngx-toastr';
-
-// party-payments-default-rtdb.europe-west1
+import { createClient } from '@supabase/supabase-js';
 
 @Component({
   selector: 'app-root',

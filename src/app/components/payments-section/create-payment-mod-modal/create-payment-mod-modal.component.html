@@ -15,7 +15,7 @@
       <mat-form-field class="users-selection" appearance="fill">
         <mat-label>Users</mat-label>
         <mat-select required [formControl]="usersToCalcSelectControl" multiple>
-          <ng-template *ngIf="usersToCalcSelect.length!==0" ngFor let-user [ngForOf]="usersToCalcSelect">
+          <ng-template *ngIf="(usersToSelect | async)?.length!==0" ngFor let-user [ngForOf]="usersToSelect | async">
             <mat-option [value]="user.uid" [disabled]="isDisabledUser(user)">
               <span>{{ user.name }}</span>
               <fa-icon *ngIf="isDisabledUser(user)" [icon]="infoIcon" [title]="getOptionHelpTitle(user)" class="info-icon"></fa-icon>
@@ -87,7 +87,7 @@
       <mat-form-field class="users-selection" appearance="fill">
         <mat-label>Users</mat-label>
         <mat-select required [formControl]="usersToExcludeSelectControl" multiple>
-          <ng-template *ngIf="usersToExcludeSelect.length!==0" ngFor let-user [ngForOf]="usersToExcludeSelect">
+          <ng-template *ngIf="(usersToSelect | async)?.length!==0" ngFor let-user [ngForOf]="usersToSelect | async">
             <mat-option [value]="user.uid">{{ user.name }}</mat-option>
           </ng-template>
         </mat-select>
