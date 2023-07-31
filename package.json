@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
+    "start": "ng serve --hmr --configuration=development",
+    "build": "ng build --configuration=production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -27,8 +27,8 @@
     "@fortawesome/fontawesome-svg-core": "^6.3.0",
     "@fortawesome/free-solid-svg-icons": "^6.3.0",
     "@igor2017/sat-popover": "^10.0.1",
-    "@supabase/supabase-js": "^2.26.0",
     "angular-confirmation-popover": "^7.0.0",
+    "axios": "^1.4.0",
     "firebase": "^9.17.1",
     "ngx-toastr": "^16.0.2",
     "rxjs": "~7.8.0",

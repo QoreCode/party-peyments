@@ -26,3 +26,20 @@ Main points:
 - unused branches have to be deleted
 - need to squash commits before merge to dev
 - CI\CD is looking on main branch, and new version will be built only if new code is pushed to main branch
+
+### Setup project
+Before starting this project you will need links to your Firebase database and API.
+
+To do this, you need to find the `environments` folder.
+<br>
+There are two files:
+  - `environment.ts` [link](src/environments/environment.ts) - for production
+  - `environment.development.ts` [link](src/environments/environment.development.ts) - for development
+
+You need to add a URL for `Firebase` and the `API`, for example:
+
+```js 
+  firebaseUrl: 'example.firebase',
+  apiUrl: 'https://example.com/api/',
+```
+

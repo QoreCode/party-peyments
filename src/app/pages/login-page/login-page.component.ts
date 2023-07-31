@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import Firebase from '@business/dal/firebase/firebase.connection';
 import { FormControl } from '@angular/forms';
+import Api from '@business/dal/api/api.connection';
 
 @Component({
   selector: 'app-login-page',
@@ -22,7 +23,7 @@ export class LoginPageComponent {
         return;
       }
 
-      Firebase.getInstance().initialize(firebaseLink);
+      Api.getInstance().initialize(firebaseLink);
 
       if (this.rememberMe) {
         localStorage.setItem('firebaseLink', firebaseLink);

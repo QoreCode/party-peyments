@@ -1,8 +1,8 @@
 import BusinessStorageFactory from '@business/storages/factories/business-storage.factory';
-import DataMappersFactory from '@business/dal/mappers/data-mappers.factory';
 import { IEntityStorage } from '@business/storages/entity-storage.interface';
 import Model from '@business/core/entity-model';
 import IDataMapper from '@business/dal/mappers/data-mapper.interface';
+import DataMappersFactory from '@business/dal/mappers/data-mappers.factory';
 
 export default abstract class EntityController<TEntity extends Model> {
   protected storageFactory: BusinessStorageFactory;

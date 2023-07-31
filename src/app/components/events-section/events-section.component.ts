@@ -10,13 +10,15 @@ import { PartyEventService } from '@services/entity-services/party-event.service
 @Component({
   selector: 'app-events-section',
   templateUrl: './events-section.component.html',
-  styleUrls: ['./events-section.component.scss']
+  styleUrls: ['./events-section.component.scss'],
 })
 export class EventsSectionComponent {
   public closeIcon = faPlus;
 
-  constructor(private partyEventService: PartyEventService, private dialog: MatDialog) {
-  }
+  constructor(
+    private partyEventService: PartyEventService,
+    private dialog: MatDialog
+  ) {}
 
   public openDialog(): void {
     this.dialog.open(CreateEventModalComponent);
@@ -25,7 +27,8 @@ export class EventsSectionComponent {
   public get partyEventsList(): Observable<PartyEvent[]> {
     return this.partyEventService.getAll().pipe(
       tap((eventsList: PartyEvent[]) => {
-        eventsList.sort((event1: PartyEvent, event2: PartyEvent) => event2.date - event1.date);
+        eventsList.sort(
+          (event1: PartyEvent, event2: PartyEvent) => event2.date - event1.date);
       })
     );
   }
