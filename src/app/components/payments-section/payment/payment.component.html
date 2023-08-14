@@ -6,10 +6,10 @@
         <div class="payment-detail-value">
           <mat-form-field class="users-selection" appearance="fill">
             <mat-select [formControl]="userIdSelectControl" [placeholder]="'Choose user'">
-              <ng-template *ngIf="usersToSelect.length!==0" ngFor let-user [ngForOf]="usersToSelect">
-                <mat-option [value]="user.uid" [disabled]="hasSomeonePayForUser(user.uid)">
+              <ng-template *ngIf="(usersToSelect | async)?.length!==0" ngFor let-user [ngForOf]="(usersToSelect | async)">
+                <mat-option [value]="user.uid" [disabled]="(hasSomeonePayForUser(user.uid) | async)!">
                   <span>{{ user.name }}</span>
-                  <fa-icon [icon]="infoIcon" *ngIf="hasSomeonePayForUser(user.uid)" [title]="getPayerUserTitle(user.uid)"></fa-icon>
+                  <fa-icon [icon]="infoIcon" *ngIf="(hasSomeonePayForUser(user.uid) | async)!" [title]="(getPayerUserTitle(user.uid) | async)!"></fa-icon>
                 </mat-option>
               </ng-template>
             </mat-select>
@@ -50,6 +50,8 @@
         </div>
       </div>
     </div>
-    <app-payment-modifications [payment]="payment"></app-payment-modifications>
+    <app-payment-modifications *ngIf="currentEvent !== undefined"
+                               [payment]="payment"
+                               [currentEvent]="currentEvent"></app-payment-modifications>
   </mat-card-content>
 </mat-card>

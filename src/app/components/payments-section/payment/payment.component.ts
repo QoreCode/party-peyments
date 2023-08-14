@@ -1,73 +1,47 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import Payment from '@business/models/payment.model';
-import User from '@business/models/user.model';
-import UserService from '@business/services/user.service';
-import { Subscription } from 'rxjs';
+import { Component, Input, OnInit } from '@angular/core';
+import Payment from '@business/modules/payment/payment.model';
+import User from '@business/modules/user/user.model';
+import { combineLatest, map, Observable } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { FormControl, Validators } from '@angular/forms';
-import EventService from '@business/services/event.service';
-import ApplicationStateService from '@business/services/application-state.service';
 import { faCircleInfo, faFloppyDisk, faTrash } from '@fortawesome/free-solid-svg-icons';
-import FirebaseEntityServiceDecorator from '@business/core/firebase/firebase-entity-service.decorator';
-import PaymentService from '@business/services/payment.service';
-import ExcludeModificationService from '@business/services/exclude-modification.service';
-import ExcludeModification from '@business/models/modifications/exclude-modification';
-import CalculationModificationService, { CalculationModification } from '@business/services/calculation-modification.service';
-import PartyEvent from '@business/models/party-event.model';
+import PartyEvent from '@business/modules/party-event/party-event.model';
+import { UserService } from '@services/entity-services/user.service';
+import { PartyEventService } from '@services/entity-services/party-event.service';
+import { UserEventPropertiesService } from '@services/entity-services/user-event-properties.service';
+import PaymentController from '@business/modules/payment/payment.controller';
+import ApplicationStateService from '@services/application-state.service';
+import UserEventProperties from '@business/modules/user-event-properties/user-event-properties.model';
 
 @Component({
   selector: 'app-payment',
   templateUrl: './payment.component.html',
   styleUrls: ['./payment.component.scss']
 })
-export class PaymentComponent implements OnDestroy, OnInit {
+export class PaymentComponent implements OnInit {
   @Input() payment!: Payment;
-
-  public allUsers: User[] = [];
-  public usersToSelect: User[] = [];
 
   public saveIcon = faFloppyDisk;
   public deleteIcon = faTrash;
   public infoIcon = faCircleInfo;
 
-  public currentEvent?: PartyEvent;
+  public currentEvent!: PartyEvent;
 
   public userIdSelectControl = new FormControl<string>('', [Validators.required]);
   public priceInputControl = new FormControl<number>(0, [Validators.required, Validators.min(0)]);
   public nameInputControl = new FormControl<string>('', [Validators.required, Validators.minLength(4)]);
 
-  public eventServiceSubscription!: Subscription;
-  public userServiceSubscription!: Subscription;
-
-  constructor(public userService: UserService,
-              public eventService: EventService,
-              public paymentService: PaymentService,
-              public applicationService: ApplicationStateService,
-              public excludeModificationService: ExcludeModificationService,
-              public calculationModificationService: CalculationModificationService,
-              public toastr: ToastrService) {
+  constructor(private paymentController: PaymentController,
+              private userService: UserService,
+              private partyEventService: PartyEventService,
+              private userEventPropService: UserEventPropertiesService,
+              private applicationStateService: ApplicationStateService,
+              private toastr: ToastrService) {
   }
 
   public async deletePayment() {
     try {
-      const excludeModifications = await this.excludeModificationService.getEntitiesByPaymentId(this.payment.uid);
-      if (excludeModifications.length) {
-        const fbExcludeServiceDec = new FirebaseEntityServiceDecorator(this.excludeModificationService);
-        await Promise.all(excludeModifications.map((excludeModification: ExcludeModification) => {
-          return fbExcludeServiceDec.deleteEntity(excludeModification.uid);
-        }));
-      }
-
-      const calculationModifications = await this.calculationModificationService.getEntitiesByPaymentId(this.payment.uid);
-      if (calculationModifications.length) {
-        const fbExcludeServiceDec = new FirebaseEntityServiceDecorator(this.calculationModificationService);
-        await Promise.all(calculationModifications.map((calculationModification: CalculationModification) => {
-          return fbExcludeServiceDec.deleteEntity(calculationModification.uid);
-        }));
-      }
-
-      const fbPaymentServiceDec = new FirebaseEntityServiceDecorator(this.paymentService);
-      await fbPaymentServiceDec.deleteEntity(this.payment.uid);
+      await this.paymentController.delete(this.payment.uid);
 
       this.toastr.success(`Payment successfully deleted!`);
     } catch (e) {
@@ -79,30 +53,34 @@ export class PaymentComponent implements OnDestroy, OnInit {
     }
   }
 
-  public hasSomeonePayForUser(userUid: string): boolean {
-    if (this.currentEvent === undefined) {
-      return false;
-    }
-
-    return this.currentEvent.findWhoPayedForUser(userUid) !== undefined;
+  public hasSomeonePayForUser(userUid: string): Observable<boolean> {
+    return this.userEventPropService.getByParam('eventUid', this.currentEvent.uid).pipe(
+      map((userEventProps: UserEventProperties[]) => {
+        return userEventProps.some((userEventProp: UserEventProperties) => userEventProp.hasPayedUserUid(userUid));
+      })
+    );
   }
 
-  public getPayerUserTitle(userUid: string): string {
-    if (this.currentEvent === undefined) {
-      return 'Some user already pay for this user';
-    }
+  public getPayerUserTitle(userUid: string): Observable<string> {
+    return combineLatest([
+      this.userEventPropService.getByParam('eventUid', this.currentEvent.uid),
+      this.userService.getAll()
+    ]).pipe(
+      map(([userEventProps, users]) => {
+        const usersMap = new Map(users.map((user: User) => [user.uid, user]));
+        const payerUserEventProps = userEventProps.find((userEventProp: UserEventProperties) => userEventProp.hasPayedUserUid(userUid));
+        if (payerUserEventProps === undefined) {
+          return 'Some user already pay for this user';
+        }
 
-    const payerUid = this.currentEvent.findWhoPayedForUser(userUid);
-    if (payerUid === undefined) {
-      return 'Some user already pay for this user';
-    }
+        const payer = usersMap.get(payerUserEventProps.userUid);
+        if (payer === undefined) {
+          return 'Some user already pay for this user';
+        }
 
-    const payer = this.allUsers.find((user: User) => user.uid === payerUid);
-    if (payer === undefined) {
-      return 'Some user already pay for this user';
-    }
-
-    return `${ payer.name } already pay for this user`;
+        return `${ payer.name } already pay for this user`;
+      })
+    );
   }
 
   public async updatePayment() {
@@ -147,8 +125,7 @@ export class PaymentComponent implements OnDestroy, OnInit {
     this.payment.money = price;
 
     try {
-      const fbPaymentServiceDec = new FirebaseEntityServiceDecorator(this.paymentService);
-      await fbPaymentServiceDec.addOrUpdateEntity(this.payment);
+      await this.paymentController.update(this.payment);
 
       this.toastr.success(`Payment successfully updated!`);
 
@@ -164,36 +141,20 @@ export class PaymentComponent implements OnDestroy, OnInit {
     }
   }
 
-  public async setUsersToSelect() {
-    const currentEventUid = this.applicationService.getSelectedEventUid();
-    if (currentEventUid === undefined) {
-      return;
-    }
-
-    const currentEvent = await this.eventService.getEntityByUid(currentEventUid);
-    if (currentEvent === undefined) {
-      this.toastr.error(`Selected event is undefined! Something went wrong!`);
-      return;
-    }
-
-    const allUsersMap = new Map(this.allUsers.map((user: User) => [user.uid, user]));
-    this.usersToSelect = currentEvent.involvedUserUids.reduce((users: User[], userUid: string) => {
-      const user = allUsersMap.get(userUid);
-      if (user !== undefined) {
-        users.push(user);
-      }
-
-      return users;
-    }, []);
-  }
-
   public get isSaveDisable() {
     return !this.userIdSelectControl.touched && !this.priceInputControl.touched && !this.nameInputControl.touched;
   }
 
-  public ngOnDestroy(): void {
-    this.userServiceSubscription.unsubscribe();
-    this.eventServiceSubscription.unsubscribe();
+  public get usersToSelect(): Observable<User[]> {
+    return combineLatest([
+      this.userService.getAll(),
+      this.userEventPropService.getByParam('eventUid', this.currentEvent?.uid)
+    ]).pipe(
+      map(([users, userEventProps]) => {
+        const userEventSet = new Set(userEventProps.map((userEventProp) => userEventProp.userUid));
+        return users.filter((user: User) => userEventSet.has(user.uid));
+      })
+    )
   }
 
   public async ngOnInit(): Promise<void> {
@@ -201,18 +162,12 @@ export class PaymentComponent implements OnDestroy, OnInit {
     this.priceInputControl.setValue(this.payment.money);
     this.nameInputControl.setValue(this.payment.name);
 
-    this.userServiceSubscription = this.userService.subscribe((allUsers) => {
-      this.allUsers = Array.from(allUsers.values());
-    });
-
-    this.eventServiceSubscription = this.eventService.subscribe(() => this.setUsersToSelect());
-
-    const currentEventUid = this.applicationService.getSelectedEventUid();
+    const currentEventUid = this.applicationStateService.getSelectedPartyEventUid();
     if (currentEventUid === undefined) {
       return;
     }
 
-    const currentEvent = await this.eventService.getEntityByUid(currentEventUid);
+    const currentEvent = await this.partyEventService.entities.find((partyEvent: PartyEvent) => partyEvent.uid === currentEventUid);
     if (currentEvent === undefined) {
       this.toastr.error(`Selected event is undefined! Something went wrong!`);
       return;

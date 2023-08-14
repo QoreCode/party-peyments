@@ -1,6 +1,6 @@
-import { Component, Input, SimpleChanges } from '@angular/core';
-import User from '@business/models/user.model';
-import Transaction from '@business/models/transaction.model';
+import { Component, Input } from '@angular/core';
+import User from '@business/modules/user/user.model';
+import Transaction from '@business/modules/transaction/transaction.model';
 import { faChevronDown, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { ToastrService } from 'ngx-toastr';
 

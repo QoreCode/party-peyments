@@ -35,6 +35,7 @@ import { PopoverModule } from '@coreui/angular';
 import { IconModule } from '@coreui/icons-angular';
 import { SatPopoverModule } from '@igor2017/sat-popover';
 import { EditUserModalComponent } from './components/users-section/edit-user-modal/edit-user-modal.component';
+import { RelatedUsersComponent } from '@app/components/users-section/user/related-users/related-users.component';
 
 @NgModule({
   declarations: [
@@ -54,6 +55,7 @@ import { EditUserModalComponent } from './components/users-section/edit-user-mod
     PaymentModificationsComponent,
     TransactionItemComponent,
     EditUserModalComponent,
+    RelatedUsersComponent,
   ],
   imports: [
     BrowserModule,

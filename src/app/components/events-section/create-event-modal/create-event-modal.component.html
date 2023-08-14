@@ -8,10 +8,10 @@
         <input matInput placeholder="Please enter event name" value="event-name" [formControl]="nameInputControl">
       </mat-form-field>
 
-      <mat-form-field class="users-selection" appearance="fill" *ngIf="users.length>0; else noUsersBlock">
+      <mat-form-field class="users-selection" appearance="fill" *ngIf="(users | async)?.length !== 0; else noUsersBlock">
         <mat-label>Users</mat-label>
         <mat-select [formControl]="userIdsInputControl" multiple>
-          <ng-template *ngIf="users.length!==0" ngFor let-user [ngForOf]="users">
+          <ng-template *ngIf="(users | async)?.length!==0" ngFor let-user [ngForOf]="users | async">
             <mat-option [value]="user.uid">{{ user.name }}</mat-option>
           </ng-template>
         </mat-select>

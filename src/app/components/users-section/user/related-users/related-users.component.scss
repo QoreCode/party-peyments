@@ -1,0 +1,150 @@
+.related-users-wrap {
+  padding: 0 5px;
+  z-index: 1;
+  width: calc(100% - 40px);
+  margin: 0 auto;
+  height: 19px;
+  display: flex;
+  justify-content: flex-end;
+  border-radius: 0 0 10px 10px;
+  transition: all 0.2s;
+
+  &.isOpened {
+    height: 49px;
+
+    .related-users-down-icon {
+      border-top: 1px solid #aaa;
+    }
+
+    fa-icon {
+      transform: rotateZ(180deg);
+    }
+  }
+}
+
+.related-users-down-icon {
+  background-color: #eee;
+  text-align: center;
+  position: relative;
+  cursor: pointer;
+  margin: 0 -5px;
+  border-radius: 0 0 10px 10px;
+
+  fa-icon {
+    position: relative;
+    display: block;
+  }
+
+  &:hover {
+    fa-icon {
+      animation: bouncing 0.7s linear infinite;
+    }
+  }
+}
+
+.payed-for-label {
+  padding: 7px 5px;
+  font-size: 12px;
+}
+
+.no-user-text {
+  width: 100%;
+  font-size: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 28px;
+  color: #999;
+}
+
+::ng-deep {
+  .mdc-list-item__primary-text {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+
+    fa-icon {
+      font-size: 20px;
+    }
+
+    .info-icon, .info-disabled-icon {
+      cursor: help;
+    }
+
+    .info-icon {
+      color: #448AFF;
+    }
+  }
+
+  .mat-mdc-select-placeholder {
+    font-size: 12px;
+  }
+
+  .mat-mdc-select-value {
+    padding: 0 5px;
+  }
+
+  .payed-for {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .mat-mdc-select {
+      background-color: white;
+      transition: all 0.1s;
+
+      &:hover {
+        background-color: #eee;
+      }
+    }
+
+    .mat-mdc-form-field-infix {
+      padding-top: 0 !important;
+      min-height: 20px;
+    }
+
+    .mat-mdc-form-field {
+      height: 25px;
+    }
+
+    .mdc-line-ripple {
+      display: none;
+    }
+
+    .mat-mdc-select-value-text {
+      font-size: 12px;
+    }
+
+    .mat-mdc-form-field {
+      width: 170px;
+    }
+
+    .mat-mdc-form-field-subscript-wrapper {
+      display: none;
+    }
+  }
+}
+
+::ng-deep {
+  .popover {
+    width: 380px;
+  }
+
+  .popover-content p {
+    max-height: 300px;
+    overflow: auto;
+    line-height: 1.3em;
+  }
+}
+
+@keyframes bouncing {
+  0% {
+    top: -1px;
+  }
+  50% {
+    top: 1px;
+  }
+  100% {
+    top: -1px;
+  }
+}

@@ -1,45 +1,31 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import EventService from '@business/services/event.service';
-import PartyEvent from '@business/models/party-event.model';
-import { Subscription } from 'rxjs';
-import FirebaseEntityServiceDecorator from '@business/core/firebase/firebase-entity-service.decorator';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import PartyEvent from '@business/modules/party-event/party-event.model';
+import { Observable, tap } from 'rxjs';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { MatDialog } from '@angular/material/dialog';
 import { CreateEventModalComponent } from '@app/components/events-section/create-event-modal/create-event-modal.component';
-import ApplicationStateService from '@business/services/application-state.service';
+import { PartyEventService } from '@services/entity-services/party-event.service';
 
 @Component({
   selector: 'app-events-section',
   templateUrl: './events-section.component.html',
   styleUrls: ['./events-section.component.scss']
 })
-export class EventsSectionComponent implements OnDestroy, OnInit {
-  public eventsList: PartyEvent[] = [];
-  public eventsSubscription!: Subscription;
+export class EventsSectionComponent {
   public closeIcon = faPlus;
 
-  constructor(private eventService: EventService, public dialog: MatDialog, private applicationStateService: ApplicationStateService) {
-    const fbDec = new FirebaseEntityServiceDecorator(this.eventService);
-    fbDec.getEntities();
-  }
-
-  public ngOnDestroy(): void {
-    this.eventsSubscription.unsubscribe();
+  constructor(private partyEventService: PartyEventService, private dialog: MatDialog) {
   }
 
   public openDialog(): void {
     this.dialog.open(CreateEventModalComponent);
   }
 
-  public ngOnInit(): void {
-    this.eventsSubscription = this.eventService.subscribe((entities: Map<string, PartyEvent>) => {
-      this.eventsList = Array.from(entities.values()).sort((event1: PartyEvent, event2: PartyEvent) => {
-        return event2.date - event1.date;
-      });
-
-      if (this.eventsList.length !== 0 && this.applicationStateService.getSelectedEventUid() === undefined) {
-        this.applicationStateService.setSelectedEventUid(this.eventsList[0].uid);
-      }
-    });
+  public get partyEventsList(): Observable<PartyEvent[]> {
+    return this.partyEventService.getAll().pipe(
+      tap((eventsList: PartyEvent[]) => {
+        eventsList.sort((event1: PartyEvent, event2: PartyEvent) => event2.date - event1.date);
+      })
+    );
   }
 }

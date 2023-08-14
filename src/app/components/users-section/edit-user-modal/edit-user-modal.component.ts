@@ -1,10 +1,9 @@
 import { Component, Inject } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import User from '@business/models/user.model';
-import FirebaseEntityServiceDecorator from '@business/core/firebase/firebase-entity-service.decorator';
+import User from '@business/modules/user/user.model';
 import { ToastrService } from 'ngx-toastr';
-import UserService from '@business/services/user.service';
+import UserController from '@business/modules/user/user.controller';
 
 @Component({
   selector: 'app-edit-user-modal',
@@ -24,9 +23,10 @@ export class EditUserModalComponent {
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: { user: User },
-    public dialogRef: MatDialogRef<EditUserModalComponent>,
-    public toastr: ToastrService,
-    public userService: UserService) {
+    private userController: UserController,
+    private dialogRef: MatDialogRef<EditUserModalComponent>,
+    private toastr: ToastrService,
+  ) {
     this.user = data.user;
 
     this.nameInputControl.setValue(this.user.name);
@@ -59,8 +59,7 @@ export class EditUserModalComponent {
     this.user.card = this.cardNumberInputControl.getRawValue() ? String(this.cardNumberInputControl.getRawValue()) : undefined;
     this.user.name = userName;
 
-    const userServiceFBDec = new FirebaseEntityServiceDecorator(this.userService);
-    await userServiceFBDec.addOrUpdateEntity(this.user);
+    await this.userController.update(this.user);
 
     this.toastr.success('User was successfully created');
     this.dialogRef.close();

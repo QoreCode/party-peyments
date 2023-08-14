@@ -1,13 +1,12 @@
 import { Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { FormControl, Validators } from '@angular/forms';
-import EventService from '@business/services/event.service';
-import FirebaseEntityServiceDecorator from '@business/core/firebase/firebase-entity-service.decorator';
-import PartyEvent from '@business/models/party-event.model';
 import { ToastrService } from 'ngx-toastr';
-import UserService from '@business/services/user.service';
-import User from '@business/models/user.model';
-import ApplicationStateService from '@business/services/application-state.service';
+import User from '@business/modules/user/user.model';
+import PartyEventController from '@business/modules/party-event/party-event.controller';
+import { UserService } from '@services/entity-services/user.service';
+import { Observable } from 'rxjs';
+import ApplicationStateService from '@services/application-state.service';
 
 @Component({
   selector: 'app-create-event-modal',
@@ -15,18 +14,21 @@ import ApplicationStateService from '@business/services/application-state.servic
   styleUrls: ['./create-event-modal.component.scss']
 })
 export class CreateEventModalComponent {
-  public nameInputControl = new FormControl('',
-    [Validators.required, Validators.minLength(4), Validators.maxLength(200)]);
-  public users: User[] = [];
   public userIdsInputControl = new FormControl<string[]>([]);
+  public nameInputControl = new FormControl('', [
+    Validators.required, Validators.minLength(4), Validators.maxLength(200)
+  ]);
 
-  constructor(public dialogRef: MatDialogRef<CreateEventModalComponent>,
-              public toastr: ToastrService,
+  constructor(private partyEventController: PartyEventController,
               private applicationStateService: ApplicationStateService,
-              public eventService: EventService,
-              public userService: UserService
+              private userService: UserService,
+              private dialogRef: MatDialogRef<CreateEventModalComponent>,
+              private toastr: ToastrService,
   ) {
-    this.userService.getEntities().then((users: User[]) => this.users = users);
+  }
+
+  public get users(): Observable<User[]> {
+    return this.userService.getAll();
   }
 
   async createEvent() {
@@ -51,11 +53,8 @@ export class CreateEventModalComponent {
       return;
     }
 
-    const event = PartyEvent.create(eventName, eventUserIds);
-    const eventServiceFBDec = new FirebaseEntityServiceDecorator(this.eventService);
-    await eventServiceFBDec.addOrUpdateEntity(event);
-
-    this.applicationStateService.setSelectedEventUid(event.uid);
+    const partyEvent = await this.partyEventController.create(eventName, eventUserIds);
+    this.applicationStateService.setSelectedPartyEventUid(partyEvent.uid);
 
     this.toastr.success('Event was successfully created');
     this.dialogRef.close();

@@ -1,11 +1,11 @@
 <div class="events-wrap">
-  <div class="section-event-message" *ngIf="eventsList.length === 0">
+  <div class="section-event-message" *ngIf="(partyEventsList | async)?.length === 0">
     You have no events, please <span class="add-one-text" (click)="openDialog()">add one</span>
   </div>
-  <div class="events-list-wrap" *ngIf="eventsList.length !== 0">
+  <div class="events-list-wrap" *ngIf="(partyEventsList | async)?.length !== 0">
     <div class="events-title">Events</div>
     <div class="events-list">
-      <ng-template ngFor let-event [ngForOf]="eventsList">
+      <ng-template ngFor let-event [ngForOf]="partyEventsList | async">
         <app-event [partyEvent]="event"></app-event>
       </ng-template>
     </div>

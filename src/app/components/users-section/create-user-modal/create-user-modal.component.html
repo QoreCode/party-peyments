@@ -1,6 +1,6 @@
 <div class="user-modal-wrap">
   <div class="user-modal-title" mat-dialog-title>
-    <div class="user-modal-label" [ngClass]="{isActive: !isNewUserState, disabled: users.length===0}" (click)="setIsNewUserState(false)">
+    <div class="user-modal-label" [ngClass]="{isActive: !isNewUserState, disabled: (usersToSelect | async)?.length===0}" (click)="setIsNewUserState(false)">
       <span [title]="getExistedUsersTitle()">Add existed users</span>
     </div>
     <div class="user-modal-separator">/</div>
@@ -14,7 +14,7 @@
       <mat-form-field class="users-selection" appearance="fill">
         <mat-label>Users</mat-label>
         <mat-select required [formControl]="userIdsInputControl" multiple>
-          <ng-template *ngIf="users.length!==0" ngFor let-user [ngForOf]="users">
+          <ng-template *ngIf="(usersToSelect | async)?.length!==0" ngFor let-user [ngForOf]="usersToSelect | async">
             <mat-option [value]="user.uid">{{ user.name }}</mat-option>
           </ng-template>
         </mat-select>
