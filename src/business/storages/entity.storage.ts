@@ -9,6 +9,8 @@ export default class EntityStorage<TEntity extends Model> implements IEntityStor
   private static _messageBus: StorageMessageBus = new StorageMessageBus();
 
   constructor() {
+    // @ts-ignore
+    window.messageBus = EntityStorage._messageBus;
   }
 
   protected get messageBus(): StorageMessageBus {

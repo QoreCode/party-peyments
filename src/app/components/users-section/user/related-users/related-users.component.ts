@@ -42,7 +42,7 @@ export class RelatedUsersComponent implements OnDestroy, OnInit {
   public ngOnInit(): void {
     this.userEventPopsSub = this.applicationStateService.subscribe((applicationState: ApplicationState) => {
       const userEventProps = this.userEventService.entities.filter((userEventProp: UserEventProperties) => {
-        return userEventProp.eventUid === this.currentEvent.uid && userEventProp.userUid === this.user.uid;
+        return userEventProp.eventUid === applicationState.selectedPartyEventUid && userEventProp.userUid === this.user.uid;
       })
 
       if (userEventProps.length === 0) {
@@ -68,7 +68,7 @@ export class RelatedUsersComponent implements OnDestroy, OnInit {
 
   public get isSomeonePayedForThisUser(): Observable<boolean> {
     return this.userEventService.getByFilter((userEventProp: UserEventProperties) => {
-      return userEventProp.hasPayedUserUid(this.user.uid);
+      return userEventProp.eventUid === this.currentEvent.uid && userEventProp.hasPayedUserUid(this.user.uid);
     }).pipe(
       map((userEventProps: UserEventProperties[]) => userEventProps.length !== 0)
     )
@@ -77,7 +77,7 @@ export class RelatedUsersComponent implements OnDestroy, OnInit {
   public get payedUserName(): Observable<string[]> {
     return combineLatest([
       this.userEventService.getByFilter((userEventProp: UserEventProperties) => {
-        return userEventProp.hasPayedUserUid(this.user.uid);
+        return userEventProp.eventUid === this.currentEvent.uid && userEventProp.hasPayedUserUid(this.user.uid);
       }),
       this.userService.getAll()
     ]).pipe(

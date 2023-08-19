@@ -29,10 +29,6 @@ export class MainPageComponent implements OnDestroy, OnInit {
   ) {
   }
 
-  public get isAppLoaded(){
-    return this.isEntitiesLoaded;
-  }
-
   ngOnDestroy(): void {
     this.appServiceSubscription?.unsubscribe();
   }

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { map, Observable, Subscription, tap } from 'rxjs';
 import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
@@ -53,8 +53,9 @@ export class PaymentsSectionComponent implements OnDestroy, OnInit {
       this.toastr.error(`No selected event found. You are scaring me!`);
       return;
     }
-
-    await this.paymentController.create('', null, 0, selectedEventUid);
+    // TODO: change this userUid to member uid when it has done
+    const { uid } = this.userEventPropertiesService.extractByParams('eventUid', selectedEventUid)[0];
+    await this.paymentController.create('Паб №1', uid, 100, selectedEventUid);
     this.toastr.success(`Payment was successfully added. Do not forget to save it`);
   }
 

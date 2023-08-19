@@ -13,6 +13,7 @@ import { CalculationModificationService } from '@services/entity-services/calcul
 import { ExcludeModificationService } from '@services/entity-services/exclude-modification.service';
 import UserController from '@business/modules/user/user.controller';
 import CalculationModification from '@business/modules/calculation-modification/models/calculation-modification.model';
+import UserEventPropertiesController from '@business/modules/user-event-properties/user-event-properties.controller';
 
 @Component({
   selector: 'app-user',
@@ -30,13 +31,15 @@ export class UserComponent {
   public deleteUserMessage: string = '';
   public deleteUserTimerId: number | null = null;
 
-  constructor(private userController: UserController,
-              private paymentService: PaymentService,
-              private partyEventService: PartyEventService,
-              private calculationService: CalculationModificationService,
-              private excludeService: ExcludeModificationService,
-              private toastr: ToastrService,
-              private dialog: MatDialog,
+  constructor(
+    private userController: UserController,
+    private userEventPropertiesController: UserEventPropertiesController,
+    private paymentService: PaymentService,
+    private partyEventService: PartyEventService,
+    private calculationService: CalculationModificationService,
+    private excludeService: ExcludeModificationService,
+    private toastr: ToastrService,
+    private dialog: MatDialog,
   ) {
   }
 
@@ -100,7 +103,7 @@ export class UserComponent {
         throw new Error(`User is undefined. Something unbelievable is going on`);
       }
 
-      await this.userController.delete(this.user.uid);
+      await this.userEventPropertiesController.deleteByParams({ userUid: this.user.uid, eventUid: this.currentEvent.uid });
     } catch (e) {
       if (e instanceof Error) {
         this.toastr.error(e.message);

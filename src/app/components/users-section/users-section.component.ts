@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import User from '@business/modules/user/user.model';
 import { combineLatest, map, Observable, Subscription } from 'rxjs';
@@ -32,9 +32,13 @@ export class UsersSectionComponent implements OnDestroy {
               private dialog: MatDialog
   ) {
     this.usersSubscription = this.applicationStateService.subscribe((applicationState: ApplicationState) => {
+      if (applicationState.selectedPartyEventUid === undefined) {
+        return;
+      }
+
       const partyEvent = this.partyEventService.entities.find((partyEvent: PartyEvent) => partyEvent.uid === applicationState.selectedPartyEventUid);
-      if(partyEvent === undefined){
-        this.toastr.error(`Party Event with id ${applicationState.selectedPartyEventUid} isn't defined`);
+      if (partyEvent === undefined) {
+        this.toastr.error(`Party Event with id ${ applicationState.selectedPartyEventUid } isn't defined`);
         return;
       }
 

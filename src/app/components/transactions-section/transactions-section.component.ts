@@ -1,6 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import ApplicationStateService from '../../../services/application-state.service';
-import { ToastrService } from 'ngx-toastr';
 import { combineLatest, debounce, map, Observable, Subscription, tap, timer } from 'rxjs';
 import Payment from '@business/modules/payment/payment.model';
 import Transaction from '@business/modules/transaction/transaction.model';
@@ -17,7 +16,8 @@ import TransactionController from '@business/modules/transaction/transaction.con
 @Component({
   selector: 'app-transactions-section',
   templateUrl: './transactions-section.component.html',
-  styleUrls: ['./transactions-section.component.scss']
+  styleUrls: ['./transactions-section.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TransactionsSectionComponent implements OnDestroy, OnInit {
   public selectedEventUid?: string;
@@ -26,32 +26,29 @@ export class TransactionsSectionComponent implements OnDestroy, OnInit {
   public involvedUsers: User[] = [];
 
   public applicationSubscription!: Subscription;
+  public transactionSubscription!: Subscription;
 
-  constructor(public applicationStateService: ApplicationStateService,
-              public paymentService: PaymentService,
-              private userEventPropsService: UserEventPropertiesService,
-              public transactionController: TransactionController,
-              public transactionService: TransactionService,
-              public calculationService: CalculationModificationService,
-              public excludeService: ExcludeModificationService,
-              public partyEventService: PartyEventService,
-              public toastr: ToastrService) {
+  constructor(
+    private applicationStateService: ApplicationStateService,
+    private transactionController: TransactionController,
+    private paymentService: PaymentService,
+    private userEventPropsService: UserEventPropertiesService,
+    private transactionService: TransactionService,
+    private calculationService: CalculationModificationService,
+    private excludeService: ExcludeModificationService,
+    private partyEventService: PartyEventService
+  ) {
 
-    this.generateTransactions();
+    this.transactionSubscription = this.generateTransactions().subscribe();
   }
 
   public ngOnInit(): void {
     this.applicationSubscription = this.applicationStateService.subscribe(async () => {
       this.selectedEventUid = this.applicationStateService.getSelectedPartyEventUid();
-      if (this.selectedEventUid !== undefined) {
-        this.transactionController.createTransactions(this.selectedEventUid);
-      }
+      this.createTransactions();
     });
 
-    if (this.selectedEventUid !== undefined) {
-      console.log(`asdasdsad 2`);
-      this.transactionController.createTransactions(this.selectedEventUid);
-    }
+    this.createTransactions();
   }
 
   public get hasAttachedUsers(): Observable<boolean> {
@@ -66,6 +63,7 @@ export class TransactionsSectionComponent implements OnDestroy, OnInit {
 
   public get hasPayments(): Observable<boolean> {
     return this.paymentService.getByParam('eventUid', this.selectedEventUid).pipe(
+      tap(() => console.log(`hasPayments`)),
       map((payments: Payment[]) => payments.length > 0)
     );
   }
@@ -73,14 +71,13 @@ export class TransactionsSectionComponent implements OnDestroy, OnInit {
   public get transactions(): Observable<Transaction[]> {
     return this.transactionService.getAll().pipe(
       tap((transactions: Transaction[]) => {
-        console.log(`asdasdsad`, transactions);
         this.getTransactionsMap(transactions);
       })
     );
   }
 
-  public generateTransactions(): void {
-    combineLatest([
+  public generateTransactions(): Observable<any> {
+    return combineLatest([
       this.paymentService.getByParam('eventUid', this.selectedEventUid),
       this.userEventPropsService.getByParam('eventUid', this.selectedEventUid),
       this.partyEventService.getByParam('uid', this.selectedEventUid),
@@ -89,10 +86,7 @@ export class TransactionsSectionComponent implements OnDestroy, OnInit {
     ]).pipe(
       debounce(() => timer(200)),
       tap(() => {
-        console.log(`asdasdsad 1`);
-        if (this.selectedEventUid !== undefined) {
-          this.transactionController.createTransactions(this.selectedEventUid);
-        }
+        this.createTransactions();
       })
     );
   }
@@ -118,5 +112,14 @@ export class TransactionsSectionComponent implements OnDestroy, OnInit {
 
   public ngOnDestroy(): void {
     this.applicationSubscription.unsubscribe();
+    this.transactionSubscription.unsubscribe();
+  }
+
+  private createTransactions() {
+    if (this.selectedEventUid !== undefined) {
+      this.transactionController.createTransactions(this.selectedEventUid).catch(() => {
+        // todo: catch this error
+      });
+    }
   }
 }

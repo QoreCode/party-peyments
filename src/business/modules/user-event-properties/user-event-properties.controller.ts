@@ -5,6 +5,7 @@ import UserEventProperties from '@business/modules/user-event-properties/user-ev
 import IDataMapper from '@business/dal/mappers/data-mapper.interface';
 import { IEntityStorage } from '@business/storages/entity-storage.interface';
 import { map } from 'rxjs';
+import { EntityStorageMapping } from '@business/storages/entity-storage.mapping';
 
 @Injectable({
   providedIn: 'root',
@@ -70,6 +71,21 @@ export default class UserEventPropertiesController extends EntityController<User
     await mapper.update(entity);
 
     storage.update(entity);
+  }
+
+  public async deleteByParams(params: Partial<UserEventProperties>): Promise<void> {
+    const storage = this.storageFactory.getStorage(EntityNameList.userEventProperties);
+    const userEventProps = storage.getByParams(params);
+    if (userEventProps.length !== 1) {
+      throw new Error('Relation is not found');
+    }
+
+    const userEventProp = userEventProps[0];
+
+    const mapper = this.mappersFactory.createUserEventPropertiesMapper();
+    await mapper.delete(userEventProp.uid);
+
+    storage.delete(userEventProp.uid);
   }
 
   protected getRelatedMapper(): IDataMapper<UserEventProperties> {
