@@ -1,8 +1,14 @@
 import IDataAdapter from '@business/dal/data-adapter.interface';
 import Api from './api.connection';
+import { Entity } from '../adapters/entities.list';
+import { apiEntitiesList } from './api-entities.list';
 
 export default class ApiAdapter implements IDataAdapter {
-  constructor(protected tableName: string) {}
+  protected tableName: string;
+
+  constructor(entityKey: Entity) {
+    this.tableName = apiEntitiesList[entityKey];
+  }
 
   public async create(
     entity: Record<string, any>,

@@ -39,16 +39,14 @@ Each branch should satisfy this mask `{KEYWORD}/{TICKET_NUMBER}`. For example: `
 ## Setup project
 Before starting this project you will need links to your Firebase database and API.
 
-To do this, you need to find the `environments` folder.
+To do this, you need to create the `environment.ts` file in the `root` directory.
 <br>
-There are two files:
-  - `environment.ts` [link](src/environments/environment.ts) - for production
-  - `environment.development.ts` [link](src/environments/environment.development.ts) - for development
-
 You need to add a URL for `Firebase` and the `API`, for example:
 
-```js 
+```ts 
+export const environment = {
   firebaseUrl: 'example.firebase',
   apiUrl: 'https://example.com/api/',
+};
 ```
 

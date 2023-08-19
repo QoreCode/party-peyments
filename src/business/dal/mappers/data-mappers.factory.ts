@@ -4,68 +4,55 @@ import PartyEventMapper from '@business/modules/party-event/party-event.mapper';
 import PaymentMapper from '@business/modules/payment/payment.mapper';
 import UserEventPropertiesMapper from '@business/modules/user-event-properties/user-event-properties.mapper';
 import UserMapper from '@business/modules/user/user.mapper';
-import IDataAdapter from '../data-adapter.interface';
-import { EntitiesList } from './entities.list';
-import ApiAdapter from '../api/api.adapter';
-import FirebaseAdapter from '../firebase/firebase.adapter';
-import { apiEntitiesList } from '../api/api-entities.list';
-import { firebaseEntitiesList } from '../firebase/firebase-entities.list';
-
-enum DataMapperType {
-  API,
-  FIREBASE,
-}
+import AdaptersFactory, { AdapterType } from '../adapters/adapters.factory';
+import { Entity } from '../adapters/entities.list';
 
 export default class DataMappersFactory {
-  private _adapters: Record<
-    DataMapperType,
-    (tableName: string) => IDataAdapter
-  > = {
-    [DataMapperType.API]: (tableName) => new ApiAdapter(tableName),
-    [DataMapperType.FIREBASE]: (tableName) => new FirebaseAdapter(tableName),
-  };
-  private _entitiesLists: Record<DataMapperType, EntitiesList> = {
-    [DataMapperType.API]: apiEntitiesList,
-    [DataMapperType.FIREBASE]: firebaseEntitiesList,
-  };
+  private _adaptersFactory: AdaptersFactory;
 
-  public createPartyEventMapper(type = DataMapperType.API): PartyEventMapper {
+  constructor() {
+    this._adaptersFactory = new AdaptersFactory();
+  }
+
+  public createPartyEventMapper(type = AdapterType.API): PartyEventMapper {
     return new PartyEventMapper(
-      this._adapters[type](this._entitiesLists[type].partyEvent)
+      this._adaptersFactory.createAdapter(type, Entity.PARTY_EVENT)
     );
   }
 
   public createCalculationModificationMapper(
-    type = DataMapperType.API
+    type = AdapterType.API
   ): CalculationModificationMapper {
     return new CalculationModificationMapper(
-      this._adapters[type](this._entitiesLists[type].calculationModification)
+      this._adaptersFactory.createAdapter(type, Entity.CALCULATION_MODIFICATION)
     );
   }
 
   public createExcludeModificationMapper(
-    type = DataMapperType.API
+    type = AdapterType.API
   ): ExcludeModificationMapper {
     return new ExcludeModificationMapper(
-      this._adapters[type](this._entitiesLists[type].excludeModification)
+      this._adaptersFactory.createAdapter(type, Entity.EXCLUDE_MODIFICATION)
     );
   }
 
   public createUserEventPropertiesMapper(
-    type = DataMapperType.API
+    type = AdapterType.API
   ): UserEventPropertiesMapper {
     return new UserEventPropertiesMapper(
-      this._adapters[type](this._entitiesLists[type].member)
+      this._adaptersFactory.createAdapter(type, Entity.MEMBER)
     );
   }
 
-  public createPaymentMapper(type = DataMapperType.API): PaymentMapper {
+  public createPaymentMapper(type = AdapterType.API): PaymentMapper {
     return new PaymentMapper(
-      this._adapters[type](this._entitiesLists[type].payment)
+      this._adaptersFactory.createAdapter(type, Entity.PAYMENT)
     );
   }
 
-  public createUserMapper(type = DataMapperType.API): UserMapper {
-    return new UserMapper(this._adapters[type](this._entitiesLists[type].user));
+  public createUserMapper(type = AdapterType.API): UserMapper {
+    return new UserMapper(
+      this._adaptersFactory.createAdapter(type, Entity.USER)
+    );
   }
 }

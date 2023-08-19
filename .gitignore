@@ -46,3 +46,6 @@ Thumbs.db
 # UML diagrams cache
 */**/*.bkp
 */**/*.dtmp
+
+# environment config file
+environment.ts

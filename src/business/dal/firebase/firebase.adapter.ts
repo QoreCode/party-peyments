@@ -1,9 +1,15 @@
 import IDataAdapter from '@business/dal/data-adapter.interface';
 import Firebase from '@business/dal/firebase/firebase.connection';
 import { onValue, ref, remove, set } from 'firebase/database';
+import { Entity } from '../adapters/entities.list';
+import { firebaseEntitiesList } from './firebase-entities.list';
 
 export default class FirebaseAdapter implements IDataAdapter {
-  constructor(protected tableName: string) {}
+  protected tableName: string;
+
+  constructor(entityKey: Entity) {
+    this.tableName = firebaseEntitiesList[entityKey];
+  }
 
   public async create(
     entity: Record<string, any>,

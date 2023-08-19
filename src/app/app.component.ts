@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import Api from '@business/dal/api/api.connection';
-import { environment } from '@/src/environments/environment';
+import { environment } from '@/environment';
 import Firebase from '@business/dal/firebase/firebase.connection';
 
 @Component({

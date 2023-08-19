@@ -1,10 +1,10 @@
-import { EntitiesList } from '../mappers/entities.list';
+import { EntitiesList, Entity } from '../adapters/entities.list';
 
 export const firebaseEntitiesList: EntitiesList = {
-  partyEvent: 'events',
-  payment: 'payments',
-  user: 'users',
-  excludeModification: 'exclude-modifications',
-  member: 'user-event-properties',
-  calculationModification: 'calculation-modifications',
+  [Entity.PARTY_EVENT]: 'events',
+  [Entity.PAYMENT]: 'payments',
+  [Entity.USER]: 'users',
+  [Entity.EXCLUDE_MODIFICATION]: 'exclude-modifications',
+  [Entity.MEMBER]: 'user-event-properties',
+  [Entity.CALCULATION_MODIFICATION]: 'calculation-modifications',
 };

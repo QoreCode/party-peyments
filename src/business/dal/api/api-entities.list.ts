@@ -1,10 +1,10 @@
-import { EntitiesList } from '../mappers/entities.list';
+import { EntitiesList, Entity } from '../adapters/entities.list';
 
 export const apiEntitiesList: EntitiesList = {
-  partyEvent: 'party_events',
-  payment: 'payments',
-  user: 'users',
-  excludeModification: 'exclude_modifications',
-  member: 'members',
-  calculationModification: 'calculation_modifications',
+  [Entity.PARTY_EVENT]: 'party_events',
+  [Entity.PAYMENT]: 'payments',
+  [Entity.USER]: 'users',
+  [Entity.EXCLUDE_MODIFICATION]: 'exclude_modifications',
+  [Entity.MEMBER]: 'members',
+  [Entity.CALCULATION_MODIFICATION]: 'calculation_modifications',
 };
