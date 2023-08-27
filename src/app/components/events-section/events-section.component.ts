@@ -9,7 +9,7 @@ import { PartyEventService } from '@services/entity-services/party-event.service
 @Component({
   selector: 'app-events-section',
   templateUrl: './events-section.component.html',
-  styleUrls: ['./events-section.component.scss']
+  styleUrls: ['./events-section.component.scss'],
 })
 export class EventsSectionComponent {
   public closeIcon = faPlus;

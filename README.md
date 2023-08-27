@@ -20,6 +20,20 @@ U can find a details in: [Project Structure.drawio](src%2Fassets%2FUML%2Fdiagram
     - **event bus**: A data bus that allows repositories to respond to changes in other repositories and update information in their own.
 - **services**: The usual angular services. They have access to repositories and allow components to retrieve data from them or subscribe to their updates.
 
+## Setup project
+Before starting this project you will need links to your Firebase database and API.
+
+To do this, you need to create the `environment.ts` file in the `root` directory.
+<br>
+You need to add a URL for `Firebase` and the `API`, for example:
+
+```ts 
+export const environment = {
+  firebaseUrl: 'example.firebase',
+  apiUrl: 'https://example.com/api/',
+};
+```
+
 ## Git conventions
 Three kaywords are supported: `feat`, `fix` and `hotfix`:
 - `feat` - short from `feature`. A new feature as a task or part of a story.

@@ -9,7 +9,7 @@ import IDataMapper from '@business/dal/mappers/data-mapper.interface';
   providedIn: 'root',
 })
 export default class PaymentController extends EntityController<Payment> {
-  public async create(name: string, userUid: string | null, money: number, eventUid: string): Promise<void> {
+  public async create(name: string, userUid: string, money: number, eventUid: string): Promise<void> {
     const entity = Payment.create(name, userUid, money, eventUid);
     const mapper = this.mappersFactory.createPaymentMapper();
     await mapper.create(entity);
