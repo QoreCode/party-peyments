@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import Api from '@business/dal/api/api.connection';
+import ApiConnection from '@business/dal/api/api.connection';
 import { environment } from '@/environment';
 import Firebase from '@business/dal/firebase/firebase.connection';
 
@@ -8,15 +8,10 @@ import Firebase from '@business/dal/firebase/firebase.connection';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent implements OnInit {
-  public ngOnInit() {
-    Api.getInstance().initialize(environment.apiUrl);
-    Firebase.getInstance().initialize(environment.firebaseUrl);
-  }
-
+export class AppComponent {
   public get isDBInitialized(): boolean {
     return (
-      Api.getInstance().isInitialized() &&
+      ApiConnection.getInstance().isInitialized() &&
       Firebase.getInstance().isInitialized()
     );
   }

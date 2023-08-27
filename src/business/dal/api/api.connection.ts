@@ -1,48 +1,32 @@
 import axios, { AxiosInstance } from 'axios';
 
-export default class Api {
-  private static _instance: Api;
-  private _database?: AxiosInstance;
-  private _apiURL?: string;
+export default class ApiConnection {
+  private static _instance: ApiConnection;
+  private _axiosInstance?: AxiosInstance;
 
-  private constructor() {
-  }
-
-  public static getInstance(): Api {
-    if (Api._instance === undefined) {
-      Api._instance = new Api();
+  public static getInstance(): ApiConnection {
+    if (ApiConnection._instance === undefined) {
+      ApiConnection._instance = new ApiConnection();
     }
 
-    return Api._instance;
-  }
-
-  public get apiURL(): string | undefined {
-    return this._apiURL;
+    return ApiConnection._instance;
   }
 
   public initialize(apiURL: string): void {
-    this._apiURL = apiURL;
-
-    try {
-      this._database = axios.create({
-        baseURL: apiURL,
-      });
-    } catch (e) {
-      this._database = undefined;
-
-      throw e;
-    }
+    this._axiosInstance = axios.create({
+      baseURL: apiURL,
+    });
   }
 
   public isInitialized(): boolean {
-    return this._database !== undefined;
+    return this._axiosInstance !== undefined;
   }
 
   public get db(): AxiosInstance {
-    if (this._database === undefined) {
-      throw new Error(`DB isn't initialized`);
+    if (this._axiosInstance === undefined) {
+      throw new Error(`Instance isn't initialized`);
     }
 
-    return this._database;
+    return this._axiosInstance;
   }
 }

@@ -1,13 +1,16 @@
 import IDataAdapter from '@business/dal/data-adapter.interface';
 import Firebase from '@business/dal/firebase/firebase.connection';
 import { onValue, ref, remove, set } from 'firebase/database';
-import { Entity } from '../adapters/entities.list';
-import { firebaseEntitiesList } from './firebase-entities.list';
+import { EntityKey } from '@business/dal/adapters/entities.list';
+import { firebaseEntitiesList } from '@business/dal/firebase/firebase-entities.list';
 
 export default class FirebaseAdapter implements IDataAdapter {
   protected tableName: string;
 
-  constructor(entityKey: Entity) {
+  constructor(entityKey: EntityKey) {
+    if (firebaseEntitiesList[entityKey] === undefined) {
+      throw new Error(`This '${entityKey}' entity key doesn't exist in the firebase entities list`)
+    }
     this.tableName = firebaseEntitiesList[entityKey];
   }
 

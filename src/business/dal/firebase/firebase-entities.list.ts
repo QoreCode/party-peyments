@@ -1,10 +1,10 @@
-import { EntitiesList, Entity } from '../adapters/entities.list';
+import { EntitiesList, EntityKey } from '@business/dal/adapters/entities.list';
 
 export const firebaseEntitiesList: EntitiesList = {
-  [Entity.PARTY_EVENT]: 'events',
-  [Entity.PAYMENT]: 'payments',
-  [Entity.USER]: 'users',
-  [Entity.EXCLUDE_MODIFICATION]: 'exclude-modifications',
-  [Entity.MEMBER]: 'user-event-properties',
-  [Entity.CALCULATION_MODIFICATION]: 'calculation-modifications',
+  [EntityKey.PARTY_EVENT]: 'events',
+  [EntityKey.PAYMENT]: 'payments',
+  [EntityKey.USER]: 'users',
+  [EntityKey.EXCLUDE_MODIFICATION]: 'exclude-modifications',
+  [EntityKey.MEMBER]: 'user-event-properties',
+  [EntityKey.CALCULATION_MODIFICATION]: 'calculation-modifications',
 };

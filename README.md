@@ -20,6 +20,20 @@ U can find a details in: [Project Structure.drawio](src%2Fassets%2FUML%2Fdiagram
     - **event bus**: A data bus that allows repositories to respond to changes in other repositories and update information in their own.
 - **services**: The usual angular services. They have access to repositories and allow components to retrieve data from them or subscribe to their updates.
 
+## Setup project
+Before starting this project you will need links to your Firebase database and API.
+
+To do this, you need to create the `environment.ts` file in the `root` directory.
+<br>
+You need to add a URL for `Firebase` and the `API`, for example:
+
+```ts 
+export const environment = {
+  firebaseUrl: 'example.firebase',
+  apiUrl: 'https://example.com/api/',
+};
+```
+
 ## Git conventions
 Three kaywords are supported: `feat`, `fix` and `hotfix`:
 - `feat` - short from `feature`. A new feature as a task or part of a story.
@@ -36,17 +50,7 @@ Each branch should satisfy this mask `{KEYWORD}/{TICKET_NUMBER}`. For example: `
 ### Git flow
 ![git flow](src%2Fassets%2FUML%2Fimages%2Fgit%20flow.JPG)
 
-## Setup project
-Before starting this project you will need links to your Firebase database and API.
-
-To do this, you need to create the `environment.ts` file in the `root` directory.
-<br>
-You need to add a URL for `Firebase` and the `API`, for example:
-
-```ts 
-export const environment = {
-  firebaseUrl: 'example.firebase',
-  apiUrl: 'https://example.com/api/',
-};
-```
-
+#### Main points:
+- unused branches have to be deleted
+- need to squash commits before merge to dev
+- CI\CD is looking on main\dev branches, and new version will be built only if new code is pushed to main branch

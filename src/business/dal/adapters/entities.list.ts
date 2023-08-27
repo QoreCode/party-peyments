@@ -1,4 +1,4 @@
-export enum Entity {
+export enum EntityKey {
   PARTY_EVENT = 'partyEvent',
   PAYMENT = 'payment',
   USER = 'user',
@@ -7,4 +7,4 @@ export enum Entity {
   CALCULATION_MODIFICATION = 'calculationModification',
 }
 
-export type EntitiesList = Record<Entity, string>;
+export type EntitiesList = Record<EntityKey, string>;

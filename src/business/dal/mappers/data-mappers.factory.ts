@@ -4,8 +4,8 @@ import PartyEventMapper from '@business/modules/party-event/party-event.mapper';
 import PaymentMapper from '@business/modules/payment/payment.mapper';
 import UserEventPropertiesMapper from '@business/modules/user-event-properties/user-event-properties.mapper';
 import UserMapper from '@business/modules/user/user.mapper';
-import AdaptersFactory, { AdapterType } from '../adapters/adapters.factory';
-import { Entity } from '../adapters/entities.list';
+import AdaptersFactory, { AdapterType } from '@business/dal/adapters/adapters.factory';
+import { EntityKey } from '@business/dal/adapters/entities.list';
 
 export default class DataMappersFactory {
   private _adaptersFactory: AdaptersFactory;
@@ -15,44 +15,47 @@ export default class DataMappersFactory {
   }
 
   public createPartyEventMapper(type = AdapterType.API): PartyEventMapper {
-    return new PartyEventMapper(
-      this._adaptersFactory.createAdapter(type, Entity.PARTY_EVENT)
+    const adapter = this._adaptersFactory.createAdapter(
+      type,
+      EntityKey.PARTY_EVENT
     );
+    return new PartyEventMapper(adapter);
   }
 
   public createCalculationModificationMapper(
     type = AdapterType.API
   ): CalculationModificationMapper {
-    return new CalculationModificationMapper(
-      this._adaptersFactory.createAdapter(type, Entity.CALCULATION_MODIFICATION)
+    const adapter = this._adaptersFactory.createAdapter(
+      type,
+      EntityKey.CALCULATION_MODIFICATION
     );
+    return new CalculationModificationMapper(adapter);
   }
 
   public createExcludeModificationMapper(
     type = AdapterType.API
   ): ExcludeModificationMapper {
-    return new ExcludeModificationMapper(
-      this._adaptersFactory.createAdapter(type, Entity.EXCLUDE_MODIFICATION)
+    const adapter = this._adaptersFactory.createAdapter(
+      type,
+      EntityKey.EXCLUDE_MODIFICATION
     );
+    return new ExcludeModificationMapper(adapter);
   }
 
   public createUserEventPropertiesMapper(
     type = AdapterType.API
   ): UserEventPropertiesMapper {
-    return new UserEventPropertiesMapper(
-      this._adaptersFactory.createAdapter(type, Entity.MEMBER)
-    );
+    const adapter = this._adaptersFactory.createAdapter(type, EntityKey.MEMBER);
+    return new UserEventPropertiesMapper(adapter);
   }
 
   public createPaymentMapper(type = AdapterType.API): PaymentMapper {
-    return new PaymentMapper(
-      this._adaptersFactory.createAdapter(type, Entity.PAYMENT)
-    );
+    const adapter = this._adaptersFactory.createAdapter(type, EntityKey.PAYMENT);
+    return new PaymentMapper(adapter);
   }
 
   public createUserMapper(type = AdapterType.API): UserMapper {
-    return new UserMapper(
-      this._adaptersFactory.createAdapter(type, Entity.USER)
-    );
+    const adapter = this._adaptersFactory.createAdapter(type, EntityKey.USER);
+    return new UserMapper(adapter);
   }
 }
